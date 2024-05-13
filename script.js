@@ -2,11 +2,12 @@
 console.log('Script loaded');
 const firebaseConfig = {
   apiKey: "AIzaSyAaVOmHDYkG1qHxI6QpFpgM-B3MAQXY-2U",
-    authDomain: "bettrack-88281.firebaseapp.com",
-    projectId: "bettrack-88281",
-    storageBucket: "bettrack-88281.appspot.com",
-    messagingSenderId: "674702146250",
-    appId: "1:674702146250:web:5aec6047588594e163d233"
+  authDomain: "bettrack-88281.firebaseapp.com",
+  projectId: "bettrack-88281",
+  storageBucket: "bettrack-88281.appspot.com",
+  messagingSenderId: "674702146250",
+  appId: "1:674702146250:web:5aec6047588594e163d233",
+  measurementId: "G-SKEKMK613Z"
 };
 
 // Initialize Firebase
