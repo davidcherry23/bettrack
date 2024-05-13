@@ -1,3 +1,4 @@
+// Assuming Firebase and Firestore are correctly configured and imported in another module
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -34,7 +35,11 @@ async function displayBets() {
     });
 }
 
-// Call displayBets at startup to show existing bets
+// Setup event listeners and initial data display
 document.addEventListener('DOMContentLoaded', () => {
-    displayBets();
+    const addBetButton = document.getElementById('addBetButton');
+    if (addBetButton) {
+        addBetButton.addEventListener('click', addBet);
+    }
+    displayBets(); // Initial display of bets
 });
