@@ -7,13 +7,31 @@
 </head>
 <body>
     <h1>Bet Tracking Application</h1>
-    <button onclick="addSampleBet()">Add Sample Bet</button>
+    <button id="addBetButton">Add Sample Bet</button>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+    <!-- Firebase Initialization as a Module -->
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
-    <!-- Your script -->
-    <script src="script.js"></script>
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyAaVOmHDYkG1qHxI6QpFpgM-B3MAQXY-2U",
+        authDomain: "bettrack-88281.firebaseapp.com",
+        projectId: "bettrack-88281",
+        storageBucket: "bettrack-88281.appspot.com",
+        messagingSenderId: "674702146250",
+        appId: "1:674702146250:web:5aec6047588594e163d233",
+        measurementId: "G-SKEKMK613Z"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+
+      // Import your application scripts
+      import './app.js';
+    </script>
 </body>
 </html>
