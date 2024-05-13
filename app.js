@@ -54,19 +54,27 @@ async function displayBets() {
 
         // Configure the save button
         saveButton.textContent = 'Save Changes';
-        saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value);
+        saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
 
         // Append elements to bet item
         betItem.textContent = `Bet: ${bet.name}, Amount: $${bet.amount}, Odds: ${bet.odds}, `;
         betItem.appendChild(outcomeSelect);
         betItem.appendChild(returnInput);
-        betItem.appendChild(saveButton);
+        
+        if (bet.outcome !== 'Pending') {
+            outcomeSelect.disabled = true;
+            returnInput.disabled = true;
+            saveButton.style.display = 'none';
+        } else {
+            betItem.appendChild(saveButton);
+        }
+
         betsList.appendChild(betItem);
     });
 }
 
 // Function to save changes to a bet
-async function saveBetChanges(betId, outcome, returns) {
+async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
     try {
         await updateDoc(betRef, {
@@ -74,7 +82,11 @@ async function saveBetChanges(betId, outcome, returns) {
             returns: parseFloat(returns)
         });
         alert('Bet updated successfully!');
-        displayBets(); // Refresh the display
+        displayBets(); // Optionally disable fields immediately without waiting for refresh
+
+        outcomeSelect.disabled = true;
+        returnInput.disabled = true;
+        saveButton.style.display = 'none';  // Hide the save button as it's no longer needed
     } catch (error) {
         console.error('Error updating bet: ', error);
         alert('Error updating bet');
