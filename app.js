@@ -1,16 +1,13 @@
 // Assuming Firebase App and Firestore are initialized in the index.html as shown
 
 // You need to import Firestore if you use it
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { db } from './firebaseConfig.js';
 
-const db = getFirestore();
-
-// Attach event listener from JavaScript instead of inline in HTML
 document.addEventListener('DOMContentLoaded', () => {
-  const addBetBtn = document.getElementById('addBetButton');
-  if (addBetBtn) {
-    addBetBtn.addEventListener('click', addSampleBet);
-  }
+    const addBetBtn = document.getElementById('addBetButton');
+    if (addBetBtn) {
+        addBetBtn.addEventListener('click', addSampleBet);
+    }
 });
 
 function addSampleBet() {
