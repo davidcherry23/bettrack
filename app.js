@@ -2,6 +2,7 @@
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, query, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// Function to add a bet
 async function addBet() {
     const betName = document.getElementById('betName').value;
     const betAmount = document.getElementById('betAmount').value;
@@ -23,6 +24,7 @@ async function addBet() {
     }
 }
 
+// Function to display bets
 async function displayBets() {
     const betsQuery = query(collection(db, "bets"));
     const querySnapshot = await getDocs(betsQuery);
@@ -69,11 +71,21 @@ async function displayBets() {
     });
 
     // Update sidebar summary
-    document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
-    document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
-    document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+    const profitLoss = totalReturned - totalStaked;
+    const profitLossElement = document.getElementById('profitLoss');
+    profitLossElement.textContent = `Profit/Loss: $${profitLoss.toFixed(2)}`;
+    document.getElementById('stakes').textContent = `Stakes: $${totalStaked.toFixed(2)}`;
+    document.getElementById('returns').textContent = `Returns: $${totalReturned.toFixed(2)}`;
+
+    // Conditional coloring for Profit/Loss based on the value
+    if (profitLoss < 0) {
+        profitLossElement.style.color = 'red';
+    } else {
+        profitLossElement.style.color = 'black'; // Or any default color
+    }
 }
 
+// Function to save changes to a bet
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
     try {
@@ -83,11 +95,6 @@ async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInpu
         });
         alert('Bet updated successfully!');
         displayBets(); // Refresh the list to reflect changes
-
-        // Optionally, disable fields immediately to show the bet is settled
-        outcomeSelect.disabled = true;
-        returnInput.disabled = true;
-        saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
     } catch (error) {
         console.error('Error updating bet: ', error);
         alert('Error updating bet');
