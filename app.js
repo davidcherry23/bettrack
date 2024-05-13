@@ -6,14 +6,18 @@ import { collection, addDoc, getDocs, query } from "https://www.gstatic.com/fire
 async function addBet() {
     const betName = document.getElementById('betName').value;
     const betAmount = document.getElementById('betAmount').value;
+    const betOdds = document.getElementById('betOdds').value;
 
     try {
         await addDoc(collection(db, "bets"), {
             name: betName,
-            amount: parseInt(betAmount, 10)
+            amount: parseInt(betAmount, 10),
+            odds: betOdds,
+            outcome: "Pending", // Default outcome when bet is added
+            returns: 0 // Default return when bet is added
         });
         alert('Bet added successfully!');
-        displayBets(); // Refresh the list of bets
+        displayBets();
     } catch (error) {
         console.error('Error adding bet: ', error);
         alert('Error adding bet');
@@ -30,10 +34,11 @@ async function displayBets() {
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
         const betItem = document.createElement('li');
-        betItem.textContent = `Bet: ${bet.name}, Amount: $${bet.amount}`;
+        betItem.textContent = `Bet: ${bet.name}, Amount: $${bet.amount}, Odds: ${bet.odds}, Outcome: ${bet.outcome}, Returns: $${bet.returns}`;
         betsList.appendChild(betItem);
     });
 }
+
 
 // Setup event listeners and initial data display
 document.addEventListener('DOMContentLoaded', () => {
