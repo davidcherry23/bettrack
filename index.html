@@ -1,42 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Bet Tracker</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div>
-        <input type="text" id="betName" placeholder="Bet Name">
-        <input type="number" id="betAmount" placeholder="Bet Amount">
-        <input type="text" id="betOdds" placeholder="Odds (e.g., 5/1)">
-        <button id="addBetButton">Add Bet</button>
-    </div>
+// Assuming Firebase and Firestore are correctly configured and imported in another module
+import { db } from './firebaseConfig.js';
+import { collection, addDoc, getDocs, query, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    <!-- Section to display bets in a table -->
-    <table id="betsTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Odds</th>
-                <th>Outcome</th>
-                <th>Returns</th>
-                <th></th> <!-- Actions header removed -->
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+async function addBet() {
+    const betName = document.getElementById('betName').value;
+    const betAmount = document.getElementById('betAmount').value;
+    const betOdds = document.getElementById('betOdds').value;
 
-    <!-- Sidebar for displaying summarized data -->
-    <div id="summaryChart">
-        <h3>Summary</h3>
-        <p id="totalStaked">Total Staked: $0</p>
-        <p id="totalReturned">Total Returned: $0</p>
-        <p id="profitLoss">Profit/Loss: $0</p>
-    </div>
+    try {
+        await addDoc(collection(db, "bets"), {
+            name: betName,
+            amount: parseInt(betAmount, 10),
+            odds: betOdds,
+            outcome: "Pending",
+            returns: 0
+        });
+        alert('Bet added successfully!');
+        displayBets(); // Refresh the list of bets
+    } catch (error) {
+        console.error('Error adding bet: ', error);
+        alert('Error adding bet');
+    }
+}
 
-    <script type="module" src="app.js"></script>
-</body>
-</html>
+async function displayBets() {
+    const betsQuery = query(collection(db, "bets"));
+    const querySnapshot = await getDocs(betsQuery);
+    const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
+    betsTable.innerHTML = ''; // Clear current bets
+    let totalStaked = 0;
+    let totalReturned = 0;
+
+    querySnapshot.forEach((doc) => {
+        const bet = doc.data();
+        const row = betsTable.insertRow();
+
+        row.insertCell().textContent = bet.name;
+        row.insertCell().textContent = `$${bet.amount}`;
+        row.insertCell().textContent = bet.odds;
+        row.insertCell().textContent = bet.outcome;
+        row.insertCell().textContent = `$${bet.returns}`;
+
+        const actionsCell = row.insertCell();
+        if (bet.outcome === 'Pending') {
+            const outcomeSelect = document.createElement('select');
+            ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
+                const option = document.createElement('option');
+                option.value = outcome;
+                option.textContent = outcome;
+                option.selected = outcome === bet.outcome;
+                outcomeSelect.appendChild(option);
+            });
+            actionsCell.appendChild(outcomeSelect);
+
+            const returnInput = document.createElement('input');
+            returnInput.type = 'number';
+            returnInput.value = bet.returns;
+            actionsCell.appendChild(returnInput);
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save Changes';
+            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
+            actionsCell.appendChild(saveButton);
+        }
+
+        totalStaked += parseFloat(bet.amount);
+        totalReturned += parseFloat(bet.returns);
+    });
+
+    // Update sidebar summary
+    document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+    document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
+    document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+}
+
+async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
+    const betRef = doc(db, "bets", betId);
+    try {
+        await updateDoc(betRef, {
+            outcome: outcome,
+            returns: parseFloat(returns)
+        });
+        alert('Bet updated successfully!');
+        displayBets(); // Refresh the list to reflect changes
+
+        // Optionally, disable fields immediately to show the bet is settled
+        outcomeSelect.disabled = true;
+        returnInput.disabled = true;
+        saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
+    } catch (error) {
+        console.error('Error updating bet: ', error);
+        alert('Error updating bet');
+    }
+}
+
+// Event listener to load existing bets and set up the application
+document.addEventListener('DOMContentLoaded', () => {
+    const addBetButton = document.getElementById('addBetButton');
+    if (addBetButton) {
+        addBetButton.addEventListener('click', addBet);
+    }
+    displayBets();
+});
