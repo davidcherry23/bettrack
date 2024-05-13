@@ -1,3 +1,4 @@
+User
 // Assuming Firebase and Firestore are correctly configured and imported in another module
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, query, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -6,7 +7,6 @@ async function addBet() {
     const betName = document.getElementById('betName').value;
     const betAmount = document.getElementById('betAmount').value;
     const betOdds = document.getElementById('betOdds').value;
-    const betDateTime = new Date();  // Capture current date and time
 
     try {
         await addDoc(collection(db, "bets"), {
@@ -14,23 +14,23 @@ async function addBet() {
             amount: parseInt(betAmount, 10),
             odds: betOdds,
             outcome: "Pending",
-            returns: 0,
-            dateTime: betDateTime  // Store the date and time
+            returns: 0
         });
         alert('Bet added successfully!');
-        displayBets();  // Refresh the list of bets
+        displayBets(); // Refresh the list of bets
     } catch (error) {
         console.error('Error adding bet: ', error);
         alert('Error adding bet');
     }
 }
 
-
 async function displayBets() {
     const betsQuery = query(collection(db, "bets"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
-    betsTable.innerHTML = '';  // Clear current bets
+    betsTable.innerHTML = ''; // Clear current bets
+    let totalStaked = 0;
+    let totalReturned = 0;
 
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
@@ -42,12 +42,6 @@ async function displayBets() {
         row.insertCell().textContent = bet.outcome;
         row.insertCell().textContent = `$${bet.returns}`;
 
-        // Adding date and time display
-        const dateTimeCell = row.insertCell();
-        const betDate = new Date(bet.dateTime.seconds * 1000); // Convert Timestamp to Date
-        dateTimeCell.textContent = betDate.toLocaleString();
-
-        // Existing actions cell
         const actionsCell = row.insertCell();
         if (bet.outcome === 'Pending') {
             const outcomeSelect = document.createElement('select');
@@ -75,11 +69,11 @@ async function displayBets() {
         totalReturned += parseFloat(bet.returns);
     });
 
+    // Update sidebar summary
     document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
 }
-
 
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
