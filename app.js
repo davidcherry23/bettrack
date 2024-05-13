@@ -1,7 +1,5 @@
-// Assuming Firebase App and Firestore are initialized in the index.html as shown
-
-// You need to import Firestore if you use it
 import { db } from './firebaseConfig.js';
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const addBetBtn = document.getElementById('addBetButton');
@@ -10,15 +8,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function addSampleBet() {
-    addDoc(collection(db, "bets"), {
-        name: "Test Bet",
-        amount: 100
-    }).then(docRef => {
+async function addSampleBet() {
+    try {
+        const docRef = await addDoc(collection(db, "bets"), {
+            name: "Test Bet",
+            amount: 100
+        });
         console.log("Document written with ID: ", docRef.id);
         alert("Bet added successfully!");
-    }).catch(error => {
+    } catch (error) {
         console.error("Error adding document: ", error);
         alert("Error adding bet: " + error);
-    });
+    }
 }
