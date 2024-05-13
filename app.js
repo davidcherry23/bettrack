@@ -13,8 +13,8 @@ async function addBet() {
             name: betName,
             amount: parseInt(betAmount, 10),
             odds: betOdds,
-            outcome: "Pending", // Default outcome when bet is added
-            returns: 0 // Default return when bet is added
+            outcome: "Pending",
+            returns: 0
         });
         alert('Bet added successfully!');
         displayBets(); // Refresh the list of bets
@@ -30,7 +30,8 @@ async function displayBets() {
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
     betsTable.innerHTML = ''; // Clear current bets
-    let totalPL = 0;
+    let totalReturns = 0;
+    let totalStaked = 0;
 
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
@@ -48,7 +49,8 @@ async function displayBets() {
         oddsCell.textContent = bet.odds;
         outcomeCell.textContent = bet.outcome;
         returnsCell.textContent = `$${bet.returns}`;
-        totalPL += parseFloat(bet.returns);
+        totalStaked += parseFloat(bet.amount);
+        totalReturns += parseFloat(bet.returns);
 
         if (bet.outcome === 'Pending') {
             const outcomeSelect = document.createElement('select');
@@ -71,17 +73,24 @@ async function displayBets() {
 
             const saveButton = document.createElement('button');
             saveButton.textContent = 'Save Changes';
-            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton, row);
+            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
             actionsCell.appendChild(saveButton);
         }
     });
 
     // Update total profit/loss
-    document.getElementById('totalPL').textContent = `$${totalPL.toFixed(2)}`;
+    document.getElementById('totalAmountStaked').textContent = `$${totalStaked.toFixed(2)}`;
+    document.getElementById('totalReturns').textContent = `$${totalReturns.toFixed(2)}`;
+
+    // Update sidebar summary
+    const profitLoss = totalReturns - totalStaked;
+    document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+    document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturns.toFixed(2)}`;
+    document.getElementById('profitLoss').textContent = `Profit/Loss: $${profitLoss.toFixed(2)}`;
 }
 
 // Function to save changes to a bet
-async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton, row) {
+async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
     try {
         await updateDoc(betRef, {
@@ -95,7 +104,6 @@ async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInpu
         outcomeSelect.disabled = true;
         returnInput.disabled = true;
         saveButton.style.display = 'none';  // Hide the save button as it's no longer needed
-        row.style.opacity = '0.5';  // Visually indicate the bet is settled
     } catch (error) {
         console.error('Error updating bet: ', error);
         alert('Error updating bet');
