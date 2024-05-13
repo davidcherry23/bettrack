@@ -1,5 +1,4 @@
-// Here you can add JavaScript to manipulate your bets
-console.log('Script loaded');
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAaVOmHDYkG1qHxI6QpFpgM-B3MAQXY-2U",
   authDomain: "bettrack-88281.firebaseapp.com",
