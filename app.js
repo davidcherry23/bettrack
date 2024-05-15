@@ -82,7 +82,7 @@ async function displayBets() {
     });
 
     // Update sidebar summary
-    document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+ document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
 }
