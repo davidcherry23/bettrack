@@ -8,22 +8,30 @@ async function addBet() {
     const betOdds = document.getElementById('betOdds').value;
     const betDate = document.getElementById('betDate').value; // Get the date/time input value
 
-    try {
-        await addDoc(collection(db, "bets"), {
-            name: betName,
-            amount: parseInt(betAmount, 10),
-            odds: betOdds,
-            date: betDate, // Store date/time
-            outcome: "Pending",
-            returns: 0
-        });
-        alert('Bet added successfully!');
-        displayBets(); // Refresh the list of bets
-    } catch (error) {
-        console.error('Error adding bet: ', error);
-        alert('Error adding bet');
+    // Ensure amount is parsed as a float
+    const parsedAmount = parseFloat(betAmount);
+
+    if (!isNaN(parsedAmount)) {
+        try {
+            await addDoc(collection(db, "bets"), {
+                name: betName,
+                amount: parsedAmount, // Store as a float
+                odds: betOdds,
+                date: betDate, // Store date/time
+                outcome: "Pending",
+                returns: 0
+            });
+            alert('Bet added successfully!');
+            displayBets(); // Refresh the list of bets
+        } catch (error) {
+            console.error('Error adding bet: ', error);
+            alert('Error adding bet');
+        }
+    } else {
+        alert('Please enter a valid amount');
     }
 }
+
 
 
 async function displayBets() {
