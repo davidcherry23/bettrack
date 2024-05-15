@@ -1,16 +1,60 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
+    background-color: #f4f4f9;
+    color: #333;
 }
 
-input[type="text"], input[type="number"] {
-    padding: 8px;
+input[type="text"], input[type="number"], input[type="datetime-local"] {
+    padding: 10px;
     margin: 5px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    width: 200px; /* Consistent input width */
 }
 
 button {
-    padding: 10px 15px;
+    padding: 10px 20px;
     cursor: pointer;
+    background-color: #4CAF50; /* A fresh, vibrant green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#summaryChart {
+    background-color: white;
+    padding: 15px;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 5px;
+}
+
+h3 {
+    color: #333;
 }
 
 ul {
