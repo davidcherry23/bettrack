@@ -39,11 +39,11 @@ querySnapshot.forEach((doc) => {
     const row = betsTable.insertRow();
 
     row.insertCell().textContent = bet.name;
-    row.insertCell().textContent = `$${bet.amount}`;
+    row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`; // Format to two decimal places
     row.insertCell().textContent = bet.odds;
-    row.insertCell().textContent = bet.date; // Display the date/time
+    row.insertCell().textContent = bet.date; // Assuming this shows the formatted date
     row.insertCell().textContent = bet.outcome;
-    row.insertCell().textContent = `$${bet.returns}`;
+    row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`; // Also ensure returns are displayed to two decimals
     
         const actionsCell = row.insertCell();
         if (bet.outcome === 'Pending') {
