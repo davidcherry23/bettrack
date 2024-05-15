@@ -6,28 +6,30 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div>
-        <input type="text" id="betName" placeholder="Bet Name">
-        <input type="number" id="betAmount" placeholder="Bet Amount">
-        <input type="text" id="betOdds" placeholder="Odds (e.g., 5/1)">
-        <button id="addBetButton">Add Bet</button>
-    </div>
+ <div>
+    <input type="text" id="betName" placeholder="Bet Name">
+    <input type="number" id="betAmount" placeholder="Bet Amount">
+    <input type="text" id="betOdds" placeholder="Odds (e.g., 5/1)">
+    <input type="datetime-local" id="betDate" placeholder="Date/Time"> <!-- New input for date/time -->
+    <button id="addBetButton">Add Bet</button>
+</div>
 
-    <!-- Section to display bets in a table -->
-    <table id="betsTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Odds</th>
-                <th>Outcome</th>
-                <th>Returns</th>
-                <th></th> <!-- Actions header removed -->
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+<table id="betsTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Odds</th>
+            <th>Date/Time</th> <!-- New column for date/time -->
+            <th>Outcome</th>
+            <th>Returns</th>
+            <th></th> <!-- Actions header -->
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
 
     <!-- Sidebar for displaying summarized data -->
     <div id="summaryChart">
