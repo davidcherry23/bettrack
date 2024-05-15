@@ -1,6 +1,6 @@
 // Assuming Firebase and Firestore are correctly configured and imported in another module
 import { db } from './firebaseConfig.js';
-import { collection, addDoc, getDocs, query, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, query, doc, updateDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 async function addBet() {
     const betName = document.getElementById('betName').value;
