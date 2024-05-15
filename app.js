@@ -6,12 +6,14 @@ async function addBet() {
     const betName = document.getElementById('betName').value;
     const betAmount = document.getElementById('betAmount').value;
     const betOdds = document.getElementById('betOdds').value;
+    const betDate = document.getElementById('betDate').value; // Get the date/time input value
 
     try {
         await addDoc(collection(db, "bets"), {
             name: betName,
             amount: parseInt(betAmount, 10),
             odds: betOdds,
+            date: betDate, // Store date/time
             outcome: "Pending",
             returns: 0
         });
@@ -23,6 +25,7 @@ async function addBet() {
     }
 }
 
+
 async function displayBets() {
     const betsQuery = query(collection(db, "bets"));
     const querySnapshot = await getDocs(betsQuery);
@@ -31,16 +34,17 @@ async function displayBets() {
     let totalStaked = 0;
     let totalReturned = 0;
 
-    querySnapshot.forEach((doc) => {
-        const bet = doc.data();
-        const row = betsTable.insertRow();
+querySnapshot.forEach((doc) => {
+    const bet = doc.data();
+    const row = betsTable.insertRow();
 
-        row.insertCell().textContent = bet.name;
-        row.insertCell().textContent = `$${bet.amount}`;
-        row.insertCell().textContent = bet.odds;
-        row.insertCell().textContent = bet.outcome;
-        row.insertCell().textContent = `$${bet.returns}`;
-
+    row.insertCell().textContent = bet.name;
+    row.insertCell().textContent = `$${bet.amount}`;
+    row.insertCell().textContent = bet.odds;
+    row.insertCell().textContent = bet.date; // Display the date/time
+    row.insertCell().textContent = bet.outcome;
+    row.insertCell().textContent = `$${bet.returns}`;
+    
         const actionsCell = row.insertCell();
         if (bet.outcome === 'Pending') {
             const outcomeSelect = document.createElement('select');
