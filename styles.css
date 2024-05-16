@@ -45,6 +45,11 @@ th {
     color: white;
 }
 
+/* Add alternating background colors to table rows */
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* Light gray background color */
+}
+
 #summaryChart {
     background-color: white;
     padding: 15px;
