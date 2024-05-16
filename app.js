@@ -69,9 +69,6 @@ async function displayBets() {
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
 }
 
-    // Update pagination controls
-    updatePaginationControls(querySnapshot.size);
-}
 
 function updatePaginationControls(totalBets) {
     const totalPages = Math.ceil(totalBets / betsPerPage);
