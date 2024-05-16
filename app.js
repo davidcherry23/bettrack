@@ -102,12 +102,6 @@ async function displayBets(pageNumber = 1, pageSize = 10) {
                 actionsCell.appendChild(saveButton);
             }
 
-            // Create delete button for each bet
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.onclick = () => deleteBet(doc.id);
-            actionsCell.appendChild(deleteButton);
-
             // Calculate total staked and returned
             totalStaked += parseFloat(bet.amount);
             totalReturned += parseFloat(bet.returns);
@@ -118,6 +112,8 @@ async function displayBets(pageNumber = 1, pageSize = 10) {
     document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+}
+
 
     // Add pagination controls
     const paginationContainer = document.getElementById('paginationContainer');
