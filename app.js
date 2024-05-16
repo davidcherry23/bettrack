@@ -43,36 +43,17 @@ async function displayBets() {
     let totalStaked = 0;
     let totalReturned = 0;
 
-    let currentDay = null;
-    let currentDayGroup = null;
-
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
-        const betDate = bet.date.split('T')[0]; // Extract date without time
+        const row = betsTable.insertRow();
 
-        if (betDate !== currentDay) {
-            // If a new day is encountered, create a new group
-            currentDay = betDate;
-            currentDayGroup = document.createElement('tbody');
-            const dateRow = currentDayGroup.insertRow();
-            const dateCell = dateRow.insertCell();
-            dateCell.colSpan = 6;
-            dateCell.textContent = betDate;
-
-            // Add click event listener to toggle visibility of the tbody element
-            dateCell.addEventListener('click', () => toggleDayGroupVisibility(currentDayGroup));
-
-            betsTable.appendChild(currentDayGroup); // Append the new tbody for the current day's group
-        }
-
-        // Display the bet within the current day's group
-        const row = currentDayGroup.insertRow();
         row.insertCell().textContent = bet.name;
         row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
         row.insertCell().textContent = bet.odds;
+        row.insertCell().textContent = bet.date; // Display the date/time
         row.insertCell().textContent = bet.outcome;
         row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
-
+    
         const actionsCell = row.insertCell();
         if (bet.outcome === 'Pending') {
             const outcomeSelect = document.createElement('select');
@@ -101,20 +82,10 @@ async function displayBets() {
     });
 
     // Update sidebar summary
-    document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+ document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
 }
-
-// Function to toggle visibility of the day's group
-function toggleDayGroupVisibility(dayGroup) {
-    if (dayGroup.style.display === 'none' || !dayGroup.style.display) {
-        dayGroup.style.display = 'table-row-group';
-    } else {
-        dayGroup.style.display = 'none';
-    }
-}
-
 
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
