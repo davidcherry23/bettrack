@@ -1,25 +1,27 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
-    background-color: #f4f4f9;
+    background-color: #f9f9f9;
     color: #333;
 }
 
 input[type="text"], input[type="number"], input[type="datetime-local"] {
-    padding: 10px;
-    margin: 5px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    width: 200px; /* Consistent input width */
+    padding: 12px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 6px;
+    background-color: #f2f2f2;
+    width: 100%; /* Full width input */
+    box-sizing: border-box;
 }
 
 button {
-    padding: 10px 20px;
+    padding: 12px 20px;
     cursor: pointer;
-    background-color: #4CAF50; /* A fresh, vibrant green */
+    background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 16px;
     transition: background-color 0.3s ease;
 }
@@ -36,7 +38,7 @@ table {
 
 th, td {
     text-align: left;
-    padding: 8px;
+    padding: 12px;
     border-bottom: 1px solid #ddd;
 }
 
@@ -45,24 +47,30 @@ th {
     color: white;
 }
 
-/* Add alternating background colors to table rows */
 tr:nth-child(even) {
-    background-color: #f2f2f2; /* Light gray background color */
+    background-color: #f2f2f2;
 }
 
 #summaryChart {
     background-color: white;
-    padding: 15px;
+    padding: 20px;
     margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 h3 {
     color: #333;
+    margin-bottom: 10px;
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
+/* Responsiveness for smaller screens */
+@media only screen and (max-width: 600px) {
+    input[type="text"], input[type="number"], input[type="datetime-local"] {
+        width: calc(100% - 24px); /* Adjusting for padding */
+    }
+
+    button {
+        width: 100%;
+    }
 }
