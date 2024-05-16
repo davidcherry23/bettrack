@@ -35,7 +35,6 @@ async function addBet() {
 
 
 async function displayBets() {
-    // Add an orderBy clause to the query to sort by the 'date' field in ascending order
     const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
@@ -75,6 +74,12 @@ async function displayBets() {
             saveButton.textContent = 'Save Changes';
             saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
             actionsCell.appendChild(saveButton);
+
+            // Add edit button
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.onclick = () => editBet(doc.id);
+            actionsCell.appendChild(editButton);
         }
 
         totalStaked += parseFloat(bet.amount);
@@ -82,10 +87,17 @@ async function displayBets() {
     });
 
     // Update sidebar summary
- document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+    document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
 }
+
+// Function to switch to edit mode for a specific bet
+function editBet(betId) {
+    // Implement the logic to switch to edit mode for the specified bet here
+    console.log(`Editing bet with ID: ${betId}`);
+}
+
 
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
