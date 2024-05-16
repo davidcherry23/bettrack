@@ -5,37 +5,27 @@ body {
     color: #333;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="datetime-local"] {
-    padding: 12px;
-    margin: 8px;
-    border: 2px solid #007bff; /* Blue border */
-    border-radius: 6px;
-    width: 220px; /* Slightly wider input */
-    transition: border-color 0.3s ease; /* Smooth transition for border color */
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="datetime-local"]:focus {
-    outline: none;
-    border-color: #4CAF50; /* Green border on focus */
+input[type="text"], input[type="number"], input[type="datetime-local"] {
+    padding: 10px;
+    margin: 5px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    width: 200px; /* Consistent input width */
 }
 
 button {
-    padding: 12px 24px;
+    padding: 10px 20px;
     cursor: pointer;
-    background-color: #4CAF50; /* Green button */
+    background-color: #4CAF50; /* A fresh, vibrant green */
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 5px;
     font-size: 16px;
-    transition: background-color 0.3s ease; /* Smooth transition for background color */
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #45a049;
 }
 
 table {
@@ -46,29 +36,30 @@ table {
 
 th, td {
     text-align: left;
-    padding: 10px;
+    padding: 8px;
     border-bottom: 1px solid #ddd;
 }
 
 th {
-    background-color: #007bff; /* Blue header */
+    background-color: #4CAF50;
     color: white;
 }
 
+/* Add alternating background colors to table rows */
 tr:nth-child(even) {
-    background-color: #f2f2f2; /* Light gray background for even rows */
+    background-color: #f2f2f2; /* Light gray background color */
 }
 
 #summaryChart {
     background-color: white;
-    padding: 20px;
+    padding: 15px;
     margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 5px;
 }
 
 h3 {
-    color: #007bff; /* Blue heading */
+    color: #333;
 }
 
 ul {
