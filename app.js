@@ -47,12 +47,22 @@ async function addBet() {
     }
 }
 
-// Function to display existing bets
 async function displayBets() {
     // Retrieve bets ordered by date
     const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
+    const totalStakedElement = document.getElementById('totalStaked');
+    const totalReturnedElement = document.getElementById('totalReturned');
+    const profitLossElement = document.getElementById('profitLoss');
+    const longestLosingStreakElement = document.getElementById('longestLosingStreak');
+
+    // Check if any required elements are null
+    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement) {
+        console.error("One or more elements not found.");
+        return;
+    }
+
     betsTable.innerHTML = ''; // Clear current bets
     let totalStaked = 0;
     let totalReturned = 0;
@@ -106,12 +116,11 @@ async function displayBets() {
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
 
     // Update the summary with calculated values
-    document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
-    document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
-    document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
-    document.getElementById('longestLosingStreak').textContent = `Longest Losing Streak: ${longestLosingStreak}`;
+    totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+    totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
+    profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+    longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
 }
-
 // Function to save changes to a bet
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
