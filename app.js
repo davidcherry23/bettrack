@@ -52,6 +52,7 @@ async function displayBets() {
     const endIndex = startIndex + betsPerPage;
 
     querySnapshot.forEach((doc, index) => {
+           console.log("Document data:", doc.data()); // Add this line
         if (index >= startIndex && index < endIndex) {
             const bet = doc.data();
             const row = betsTable.insertRow();
