@@ -122,6 +122,84 @@ async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInpu
     }
 }
 
+
+async function generateReports() {
+    await generateOutcomeChart();
+    await generateProfitLossChart();
+}
+
+async function generateOutcomeChart() {
+    const betsQuery = query(collection(db, "bets"));
+    const querySnapshot = await getDocs(betsQuery);
+    const outcomeCounts = {
+        Won: 0,
+        Placed: 0,
+        Lost: 0,
+        Pending: 0
+    };
+
+    querySnapshot.forEach(doc => {
+        const outcome = doc.data().outcome;
+        outcomeCounts[outcome]++;
+    });
+
+    const outcomeChart = new ApexCharts(document.getElementById("outcomeChart"), {
+        series: Object.values(outcomeCounts),
+        chart: {
+            type: "donut"
+        },
+        labels: Object.keys(outcomeCounts)
+    });
+
+    outcomeChart.render();
+}
+
+async function generateProfitLossChart() {
+    const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
+    const querySnapshot = await getDocs(betsQuery);
+    const profitLossData = [];
+
+    let runningTotal = 0;
+
+    querySnapshot.forEach(doc => {
+        const bet = doc.data();
+        runningTotal += parseFloat(bet.returns) - parseFloat(bet.amount);
+        profitLossData.push({
+            x: new Date(bet.date),
+            y: runningTotal
+        });
+    });
+
+    const profitLossChart = new ApexCharts(document.getElementById("profitLossChart"), {
+        series: [{
+            data: profitLossData
+        }],
+        chart: {
+            type: "line",
+            height: 350
+        },
+        xaxis: {
+            type: "datetime"
+        },
+        yaxis: {
+            title: {
+                text: "Profit/Loss"
+            }
+        }
+    });
+
+    profitLossChart.render();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const addBetButton = document.getElementById('addBetButton');
+    if (addBetButton) {
+        addBetButton.addEventListener('click', addBet);
+    }
+    await displayBets();
+    await generateReports();
+});
+
 // Event listener to load existing bets and set up the application
 document.addEventListener('DOMContentLoaded', () => {
     const addBetButton = document.getElementById('addBetButton');
