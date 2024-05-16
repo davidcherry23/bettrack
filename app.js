@@ -70,22 +70,6 @@ async function displayBets() {
 }
 
 
-function updatePaginationControls(totalBets) {
-    const totalPages = Math.ceil(totalBets / betsPerPage);
-    const paginationContainer = document.getElementById('paginationContainer');
-    paginationContainer.innerHTML = ''; // Clear existing pagination controls
-
-    for (let i = 1; i <= totalPages; i++) {
-        const pageButton = document.createElement('button');
-        pageButton.textContent = i;
-        pageButton.onclick = () => {
-            currentPage = i;
-            displayBets();
-        };
-        paginationContainer.appendChild(pageButton);
-    }
-}
-
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
     try {
