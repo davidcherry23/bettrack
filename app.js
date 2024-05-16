@@ -58,7 +58,7 @@ async function displayBets() {
             const dateCell = dateRow.insertCell();
             dateCell.colSpan = 6;
             dateCell.textContent = betDate;
-            betsTable.appendChild(dateCell.parentNode);
+            betsTable.appendChild(currentDayGroup); // Append the new tbody for the current day's group
         }
 
         // Display the bet within the current day's group
