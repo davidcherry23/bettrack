@@ -22,21 +22,47 @@
         <button id="addBetButton">Add Bet</button>
     </div>
 
-    <!-- Section to display bets in a table -->
-    <table id="betsTable">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Odds</th>
-                <th>Date/Time</th>
-                <th>Outcome</th>
-                <th></th> <!-- Actions header removed -->
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    <!-- Tabs for open bets and settled bets -->
+    <div class="tab">
+        <button class="tablinks" id="defaultOpenTab" onclick="openTab(event, 'openBets')">Open Bets</button>
+        <button class="tablinks" onclick="openTab(event, 'settledBets')">Settled Bets</button>
+    </div>
+
+    <!-- Open Bets Table -->
+    <div id="openBets" class="tabcontent">
+        <table id="openBetsTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Odds</th>
+                    <th>Date/Time</th>
+                    <th>Outcome</th>
+                    <th></th> <!-- Actions header removed -->
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Settled Bets Table -->
+    <div id="settledBets" class="tabcontent">
+        <table id="settledBetsTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Odds</th>
+                    <th>Date/Time</th>
+                    <th>Outcome</th>
+                    <th>Return</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Charts Section -->
     <div id="chartsContainer" style="display: flex;">
