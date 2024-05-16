@@ -8,27 +8,42 @@ async function addBet() {
     const betOdds = document.getElementById('betOdds').value;
     const betDate = document.getElementById('betDate').value; // Get the date/time input value
 
-    // Ensure amount is parsed as a float
-    const parsedAmount = parseFloat(betAmount);
+    // Validate input fields
+    if (betName.trim() === '') {
+        alert('Please enter a bet name');
+        return;
+    }
 
-    if (!isNaN(parsedAmount)) {
-        try {
-            await addDoc(collection(db, "bets"), {
-                name: betName,
-                amount: parsedAmount, // Store as a float
-                odds: betOdds,
-                date: betDate, // Store date/time
-                outcome: "Pending",
-                returns: 0
-            });
-            alert('Bet added successfully!');
-            displayBets(); // Refresh the list of bets
-        } catch (error) {
-            console.error('Error adding bet: ', error);
-            alert('Error adding bet');
-        }
-    } else {
-        alert('Please enter a valid amount');
+    const parsedAmount = parseFloat(betAmount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+        alert('Please enter a valid bet amount');
+        return;
+    }
+
+    if (betOdds.trim() === '') {
+        alert('Please enter the odds');
+        return;
+    }
+
+    if (betDate.trim() === '') {
+        alert('Please select a date and time');
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, "bets"), {
+            name: betName,
+            amount: parsedAmount, // Store as a float
+            odds: betOdds,
+            date: betDate, // Store date/time
+            outcome: "Pending",
+            returns: 0
+        });
+        alert('Bet added successfully!');
+        displayBets(); // Refresh the list of bets
+    } catch (error) {
+        console.error('Error adding bet: ', error);
+        alert('Error adding bet: ' + error.message);
     }
 }
 
