@@ -51,7 +51,7 @@ async function addBet() {
 
 async function displayBets() {
     // Add an orderBy clause to the query to sort by the 'date' field in ascending order
-    const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
+    const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
     betsTable.innerHTML = ''; // Clear current bets
