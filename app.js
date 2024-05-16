@@ -58,6 +58,10 @@ async function displayBets() {
             const dateCell = dateRow.insertCell();
             dateCell.colSpan = 6;
             dateCell.textContent = betDate;
+
+            // Add click event listener to toggle visibility of the tbody element
+            dateCell.addEventListener('click', () => toggleDayGroupVisibility(currentDayGroup));
+
             betsTable.appendChild(currentDayGroup); // Append the new tbody for the current day's group
         }
 
@@ -100,6 +104,15 @@ async function displayBets() {
     document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+}
+
+// Function to toggle visibility of the day's group
+function toggleDayGroupVisibility(dayGroup) {
+    if (dayGroup.style.display === 'none' || !dayGroup.style.display) {
+        dayGroup.style.display = 'table-row-group';
+    } else {
+        dayGroup.style.display = 'none';
+    }
 }
 
 
