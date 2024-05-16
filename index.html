@@ -3,18 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <title>Bet Tracker</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        h1, h2, h3 {
+            color: #007bff;
+        }
+
+        #summaryChart {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #betForm {
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        #betForm input[type="text"],
+        #betForm input[type="number"],
+        #betForm input[type="datetime-local"] {
+            flex: 1;
+            margin-right: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #betForm button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #chartsContainer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        #outcomeChartContainer,
+        #profitLossChartContainer {
+            flex: 1;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
-    <div id="summaryChart" style="position: fixed; top: 20px; right: 20px;">
+    <div id="summaryChart">
         <h3>Summary</h3>
         <p id="totalStaked">Total Staked: $0</p>
         <p id="totalReturned">Total Returned: $0</p>
         <p id="profitLoss">Profit/Loss: $0</p>
     </div>
 
-    <div>
+    <div id="betForm">
         <input type="text" id="betName" placeholder="Bet Name">
         <input type="number" id="betAmount" placeholder="Bet Amount">
         <input type="text" id="betOdds" placeholder="Odds (e.g., 5/1)">
@@ -31,7 +118,6 @@
                 <th>Odds</th>
                 <th>Date/Time</th>
                 <th>Outcome</th>
-                <th></th> <!-- Actions header removed -->
             </tr>
         </thead>
         <tbody>
@@ -39,9 +125,9 @@
     </table>
 
     <!-- Charts Section -->
-    <div id="chartsContainer" style="display: flex;">
-        <div id="outcomeChartContainer" style="flex: 1;"></div>
-        <div id="profitLossChartContainer" style="flex: 1;"></div>
+    <div id="chartsContainer">
+        <div id="outcomeChartContainer"></div>
+        <div id="profitLossChartContainer"></div>
     </div>
 
     <script type="module" src="app.js"></script>
