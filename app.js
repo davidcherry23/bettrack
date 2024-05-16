@@ -2,7 +2,6 @@
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, query, doc, updateDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Function to add a new bet
 async function addBet() {
     const betName = document.getElementById('betName').value;
     const betAmount = document.getElementById('betAmount').value;
@@ -33,51 +32,61 @@ async function addBet() {
     }
 }
 
-// Function to display bets in a table
+
+
 async function displayBets() {
+    // Add an orderBy clause to the query to sort by the 'date' field in ascending order
     const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
-    betsTable.innerHTML = '';
+    betsTable.innerHTML = ''; // Clear current bets
+    let totalStaked = 0;
+    let totalReturned = 0;
 
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
         const row = betsTable.insertRow();
-        row.setAttribute('id', `row-${doc.id}`);
-        row.setAttribute('data-editable', false); // New attribute to track edit state
 
-        if (row.getAttribute('data-editable') === 'true') {
-            // If in edit mode, display input fields
-            row.insertCell().innerHTML = `<input type="text" id="name-${doc.id}" value="${bet.name}">`;
-            row.insertCell().innerHTML = `<input type="number" id="amount-${doc.id}" value="${bet.amount.toFixed(2)}">`;
-            row.insertCell().innerHTML = `<input type="text" id="odds-${doc.id}" value="${bet.odds}">`;
-            row.insertCell().innerHTML = `<input type="date" id="date-${doc.id}" value="${bet.date}">`;
-            row.insertCell().innerHTML = `<button onclick="saveUpdatedBet('${doc.id}')">Save</button>`;
-        } else {
-            // Display regular text
-            row.insertCell().textContent = bet.name;
-            row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
-            row.insertCell().textContent = bet.odds;
-            row.insertCell().textContent = bet.date;
+        row.insertCell().textContent = bet.name;
+        row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+        row.insertCell().textContent = bet.odds;
+        row.insertCell().textContent = bet.date; // Display the date/time
+        row.insertCell().textContent = bet.outcome;
+        row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
+    
+        const actionsCell = row.insertCell();
+        if (bet.outcome === 'Pending') {
+            const outcomeSelect = document.createElement('select');
+            ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
+                const option = document.createElement('option');
+                option.value = outcome;
+                option.textContent = outcome;
+                option.selected = outcome === bet.outcome;
+                outcomeSelect.appendChild(option);
+            });
+            actionsCell.appendChild(outcomeSelect);
 
-            // Add edit button
-            const editButtonCell = row.insertCell();
-            const editButton = document.createElement('button');
-            editButton.textContent = 'Edit';
-            editButton.onclick = () => toggleEditMode(doc.id);
-            editButtonCell.appendChild(editButton);
+            const returnInput = document.createElement('input');
+            returnInput.type = 'number';
+            returnInput.value = bet.returns;
+            actionsCell.appendChild(returnInput);
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save Changes';
+            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
+            actionsCell.appendChild(saveButton);
         }
-    });
-}
 
+        totalStaked += parseFloat(bet.amount);
+        totalReturned += parseFloat(bet.returns);
+    });
 
     // Update sidebar summary
-    document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+ document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
 }
 
-// Function to save changes to a bet
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
     try {
@@ -92,37 +101,6 @@ async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInpu
         outcomeSelect.disabled = true;
         returnInput.disabled = true;
         saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
-    } catch (error) {
-        console.error('Error updating bet: ', error);
-        alert('Error updating bet');
-    }
-}
-
-// Function to toggle edit mode
-function toggleEditMode(docId) {
-    const row = document.getElementById(`row-${docId}`);
-    const isEditable = row.getAttribute('data-editable') === 'true';
-    row.setAttribute('data-editable', !isEditable);
-    displayBets();  // Redraw the bets to reflect edit mode state
-}
-
-// Function to save the updated bet
-async function saveUpdatedBet(docId) {
-    const betName = document.getElementById(`name-${docId}`).value;
-    const betAmount = parseFloat(document.getElementById(`amount-${docId}`).value);
-    const betOdds = document.getElementById(`odds-${docId}`).value;
-    const betDate = document.getElementById(`date-${docId}`).value;
-
-    const betRef = doc(db, "bets", docId);
-    try {
-        await updateDoc(betRef, {
-            name: betName,
-            amount: betAmount,
-            odds: betOdds,
-            date: betDate
-        });
-        toggleEditMode(docId);  // Turn off edit mode after saving
-        alert('Bet updated successfully!');
     } catch (error) {
         console.error('Error updating bet: ', error);
         alert('Error updating bet');
