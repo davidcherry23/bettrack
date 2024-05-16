@@ -107,6 +107,69 @@ async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInpu
     }
 }
 
+// Function to toggle edit mode
+function toggleEditMode(docId) {
+    const row = document.getElementById(`row-${docId}`);
+    const isEditable = row.getAttribute('data-editable') === 'true';
+    row.setAttribute('data-editable', !isEditable);
+    displayBets();  // Redraw the bets to reflect edit mode state
+}
+
+// Function to save the updated bet
+async function saveUpdatedBet(docId) {
+    const betName = document.getElementById(`name-${docId}`).value;
+    const betAmount = parseFloat(document.getElementById(`amount-${docId}`).value);
+    const betOdds = document.getElementById(`odds-${docId}`).value;
+    const betDate = document.getElementById(`date-${docId}`).value;
+
+    const betRef = doc(db, "bets", docId);
+    try {
+        await updateDoc(betRef, {
+            name: betName,
+            amount: betAmount,
+            odds: betOdds,
+            date: betDate
+        });
+        toggleEditMode(docId);  // Turn off edit mode after saving
+        alert('Bet updated successfully!');
+    } catch (error) {
+        console.error('Error updating bet: ', error);
+        alert('Error updating bet');
+    }
+}
+
+// Adjusted displayBets function
+async function displayBets() {
+    const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
+    const querySnapshot = await getDocs(betsQuery);
+    const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
+    betsTable.innerHTML = '';
+
+    querySnapshot.forEach((doc) => {
+        const bet = doc.data();
+        const row = betsTable.insertRow();
+        row.setAttribute('id', `row-${doc.id}`);
+        row.setAttribute('data-editable', false); // New attribute to track edit state
+
+        if (row.getAttribute('data-editable') === 'true') {
+            // If in edit mode, display input fields
+            row.insertCell().innerHTML = `<input type="text" id="name-${doc.id}" value="${bet.name}">`;
+            row.insertCell().innerHTML = `<input type="number" id="amount-${doc.id}" value="${bet.amount.toFixed(2)}">`;
+            row.insertCell().innerHTML = `<input type="text" id="odds-${doc.id}" value="${bet.odds}">`;
+            row.insertCell().innerHTML = `<input type="date" id="date-${doc.id}" value="${bet.date}">`;
+            row.insertCell().innerHTML = `<button onclick="saveUpdatedBet('${doc.id}')">Save</button>`;
+        } else {
+            // Display regular text
+            row.insertCell().textContent = bet.name;
+            row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+            row.insertCell().textContent = bet.odds;
+            row.insertCell().textContent = bet.date;
+            row.insertCell().innerHTML = `<button onclick="toggleEditMode('${doc.id}')">Edit</button>`;
+        }
+    });
+}
+
+
 // Event listener to load existing bets and set up the application
 document.addEventListener('DOMContentLoaded', () => {
     const addBetButton = document.getElementById('addBetButton');
