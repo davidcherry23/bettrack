@@ -48,53 +48,26 @@ async function displayBets() {
     let totalStaked = 0;
     let totalReturned = 0;
 
-    const startIndex = (currentPage - 1) * betsPerPage;
-    const endIndex = startIndex + betsPerPage;
+    querySnapshot.forEach((doc) => {
+        const bet = doc.data();
+        const row = betsTable.insertRow();
 
-    querySnapshot.forEach((doc, index) => {
-        if (index >= startIndex && index < endIndex) {
-            const bet = doc.data();
-            const row = betsTable.insertRow();
+        row.insertCell().textContent = bet.name;
+        row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+        row.insertCell().textContent = bet.odds;
+        row.insertCell().textContent = bet.date; // Display the date/time
+        row.insertCell().textContent = bet.outcome;
+        row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
 
-            row.insertCell().textContent = bet.name;
-            row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
-            row.insertCell().textContent = bet.odds;
-            row.insertCell().textContent = bet.date; // Display the date/time
-            row.insertCell().textContent = bet.outcome;
-            row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
-
-            const actionsCell = row.insertCell();
-            if (bet.outcome === 'Pending') {
-                const outcomeSelect = document.createElement('select');
-                ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
-                    const option = document.createElement('option');
-                    option.value = outcome;
-                    option.textContent = outcome;
-                    option.selected = outcome === bet.outcome;
-                    outcomeSelect.appendChild(option);
-                });
-                actionsCell.appendChild(outcomeSelect);
-
-                const returnInput = document.createElement('input');
-                returnInput.type = 'number';
-                returnInput.value = bet.returns;
-                actionsCell.appendChild(returnInput);
-
-                const saveButton = document.createElement('button');
-                saveButton.textContent = 'Save Changes';
-                saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
-                actionsCell.appendChild(saveButton);
-            }
-
-            totalStaked += parseFloat(bet.amount);
-            totalReturned += parseFloat(bet.returns);
-        }
+        totalStaked += parseFloat(bet.amount);
+        totalReturned += parseFloat(bet.returns);
     });
 
     // Update sidebar summary
     document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+}
 
     // Update pagination controls
     updatePaginationControls(querySnapshot.size);
