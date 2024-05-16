@@ -2,29 +2,6 @@
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, query, doc, updateDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Function to calculate the longest losing streak based on date and time
-function calculateLongestLosingStreakByDateTime(bets) {
-    bets.sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort bets by date and time
-    let longestStreak = 0;
-    let currentStreak = 0;
-
-    for (let i = 0; i < bets.length; i++) {
-        if (bets[i].outcome === 'Lost') {
-            currentStreak++;
-            longestStreak = Math.max(longestStreak, currentStreak);
-        } else {
-            currentStreak = 0;
-        }
-    }
-
-    return longestStreak;
-}
-
- // Calculate the longest losing streak by date and time
-    const longestLosingStreakByDateTime = calculateLongestLosingStreakByDateTime(bets);
-    console.log('Longest Losing Streak By Date and Time:', longestLosingStreakByDateTime);
-}
-
 // Function to add a new bet
 async function addBet() {
     // Retrieve input values
@@ -79,10 +56,12 @@ async function displayBets() {
     betsTable.innerHTML = ''; // Clear current bets
     let totalStaked = 0;
     let totalReturned = 0;
+    const bets = [];
 
     // Iterate over each bet document
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
+        bets.push(bet); // Store bet for later use
         const row = betsTable.insertRow();
 
         // Fill table cells with bet information
@@ -123,19 +102,16 @@ async function displayBets() {
         totalReturned += parseFloat(bet.returns);
     });
 
- // Function to update the summary
-function updateSummary(bets) {
-    const totalStaked = bets.reduce((acc, bet) => acc + parseFloat(bet.amount), 0);
-    const totalReturned = bets.reduce((acc, bet) => acc + parseFloat(bet.returns), 0);
-    const profitLoss = totalReturned - totalStaked;
-    const longestLosingStreakByDateTime = calculateLongestLosingStreakByDateTime(bets); // Calculate longest losing streak
+    // Calculate the longest losing streak
+    const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
 
-    // Update summary elements with calculated values
+    // Update the summary with calculated values
     document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
-    document.getElementById('profitLoss').textContent = `Profit/Loss: $${profitLoss.toFixed(2)}`;
-    document.getElementById('longestLosingStreak').textContent = `Longest Losing Streak: ${longestLosingStreakByDateTime}`;
+    document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+    document.getElementById('longestLosingStreak').textContent = `Longest Losing Streak: ${longestLosingStreak}`;
 }
+
 // Function to save changes to a bet
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
@@ -158,8 +134,24 @@ async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInpu
     }
 }
 
- updateSummary(bets);
-    
+// Function to calculate the longest losing streak based on date and time
+function calculateLongestLosingStreakByDateTime(bets) {
+    bets.sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort bets by date and time
+    let longestStreak = 0;
+    let currentStreak = 0;
+
+    for (let i = 0; i < bets.length; i++) {
+        if (bets[i].outcome === 'Lost') {
+            currentStreak++;
+            longestStreak = Math.max(longestStreak, currentStreak);
+        } else {
+            currentStreak = 0;
+        }
+    }
+
+    return longestStreak;
+}
+
 // Function to generate outcome chart
 async function generateOutcomeChart() {
     const betsQuery = query(collection(db, "bets"));
