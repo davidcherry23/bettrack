@@ -63,7 +63,9 @@ async function displayBets() {
     const startIndex = (currentPage - 1) * betsPerPage;
     const endIndex = startIndex + betsPerPage;
 
-    querySnapshot.forEach((doc, index) => {
+    let index = 0;
+
+    querySnapshot.forEach(doc => {
         if (index >= startIndex && index < endIndex) {
             const bet = doc.data();
             const row = betsTable.insertRow();
@@ -100,6 +102,8 @@ async function displayBets() {
 
             totalStaked += parseFloat(bet.amount);
             totalReturned += parseFloat(bet.returns);
+
+            index++;
         }
     });
 
@@ -108,15 +112,18 @@ async function displayBets() {
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
 
-    updatePaginationControls();
+    // Calculate total number of bets
+    const totalNumberOfBets = querySnapshot.size;
+
+    updatePaginationControls(totalNumberOfBets);
 }
 
-function updatePaginationControls() {
+function updatePaginationControls(totalNumberOfBets) {
     const prevPageButton = document.getElementById('prevPageButton');
     const nextPageButton = document.getElementById('nextPageButton');
 
     prevPageButton.disabled = currentPage === 1;
-    nextPageButton.disabled = (currentPage * betsPerPage) >= totalNumberOfBets; // Assuming totalNumberOfBets is calculated elsewhere
+    nextPageButton.disabled = (currentPage * betsPerPage) >= totalNumberOfBets;
 }
 
 document.getElementById('prevPageButton').addEventListener('click', () => {
@@ -139,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     displayBets();
 });
+
 
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
