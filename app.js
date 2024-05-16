@@ -146,13 +146,16 @@ async function generateOutcomeChart() {
     const outcomeChart = new ApexCharts(document.getElementById("outcomeChart"), {
         series: Object.values(outcomeCounts),
         chart: {
-            type: "donut"
+            type: "donut",
+            width: "300", // Adjust the width of the chart
+            height: "300" // Adjust the height of the chart
         },
         labels: Object.keys(outcomeCounts)
     });
 
     outcomeChart.render();
 }
+
 
 async function generateProfitLossChart() {
     const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
