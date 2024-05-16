@@ -49,8 +49,10 @@ async function addBet() {
 
 
 
+let currentPage = 1;
+const betsPerPage = 5; // Adjust the number of bets per page as needed
+
 async function displayBets() {
-    // Add an orderBy clause to the query to sort by the 'date' field in ascending order
     const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
@@ -58,49 +60,85 @@ async function displayBets() {
     let totalStaked = 0;
     let totalReturned = 0;
 
-    querySnapshot.forEach((doc) => {
-        const bet = doc.data();
-        const row = betsTable.insertRow();
+    const startIndex = (currentPage - 1) * betsPerPage;
+    const endIndex = startIndex + betsPerPage;
 
-        row.insertCell().textContent = bet.name;
-        row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
-        row.insertCell().textContent = bet.odds;
-        row.insertCell().textContent = bet.date; // Display the date/time
-        row.insertCell().textContent = bet.outcome;
-        row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
-    
-        const actionsCell = row.insertCell();
-        if (bet.outcome === 'Pending') {
-            const outcomeSelect = document.createElement('select');
-            ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
-                const option = document.createElement('option');
-                option.value = outcome;
-                option.textContent = outcome;
-                option.selected = outcome === bet.outcome;
-                outcomeSelect.appendChild(option);
-            });
-            actionsCell.appendChild(outcomeSelect);
+    querySnapshot.forEach((doc, index) => {
+        if (index >= startIndex && index < endIndex) {
+            const bet = doc.data();
+            const row = betsTable.insertRow();
 
-            const returnInput = document.createElement('input');
-            returnInput.type = 'number';
-            returnInput.value = bet.returns;
-            actionsCell.appendChild(returnInput);
+            row.insertCell().textContent = bet.name;
+            row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+            row.insertCell().textContent = bet.odds;
+            row.insertCell().textContent = bet.date; // Display the date/time
+            row.insertCell().textContent = bet.outcome;
+            row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
 
-            const saveButton = document.createElement('button');
-            saveButton.textContent = 'Save Changes';
-            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
-            actionsCell.appendChild(saveButton);
+            const actionsCell = row.insertCell();
+            if (bet.outcome === 'Pending') {
+                const outcomeSelect = document.createElement('select');
+                ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
+                    const option = document.createElement('option');
+                    option.value = outcome;
+                    option.textContent = outcome;
+                    option.selected = outcome === bet.outcome;
+                    outcomeSelect.appendChild(option);
+                });
+                actionsCell.appendChild(outcomeSelect);
+
+                const returnInput = document.createElement('input');
+                returnInput.type = 'number';
+                returnInput.value = bet.returns;
+                actionsCell.appendChild(returnInput);
+
+                const saveButton = document.createElement('button');
+                saveButton.textContent = 'Save Changes';
+                saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
+                actionsCell.appendChild(saveButton);
+            }
+
+            totalStaked += parseFloat(bet.amount);
+            totalReturned += parseFloat(bet.returns);
         }
-
-        totalStaked += parseFloat(bet.amount);
-        totalReturned += parseFloat(bet.returns);
     });
 
     // Update sidebar summary
- document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+    document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     document.getElementById('totalReturned').textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     document.getElementById('profitLoss').textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+
+    updatePaginationControls();
 }
+
+function updatePaginationControls() {
+    const prevPageButton = document.getElementById('prevPageButton');
+    const nextPageButton = document.getElementById('nextPageButton');
+
+    prevPageButton.disabled = currentPage === 1;
+    nextPageButton.disabled = (currentPage * betsPerPage) >= totalNumberOfBets; // Assuming totalNumberOfBets is calculated elsewhere
+}
+
+document.getElementById('prevPageButton').addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        displayBets();
+    }
+});
+
+document.getElementById('nextPageButton').addEventListener('click', () => {
+    currentPage++;
+    displayBets();
+});
+
+// Update the displayBets call in the DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', () => {
+    const addBetButton = document.getElementById('addBetButton');
+    if (addBetButton) {
+        addBetButton.addEventListener('click', addBet);
+    }
+    displayBets();
+});
 
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
