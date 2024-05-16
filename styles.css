@@ -1,31 +1,36 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Roboto', sans-serif; /* Use Google Fonts for a modern look */
     padding: 20px;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: #292929;
+    color: #fff;
 }
 
 input[type="text"], input[type="number"], input[type="datetime-local"] {
-    padding: 10px;
-    margin: 5px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    width: 200px; /* Consistent input width */
+    padding: 12px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 6px;
+    background-color: #444;
+    color: #fff;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif; /* Use the same font as body */
 }
 
 button {
-    padding: 10px 20px;
+    padding: 12px 20px;
     cursor: pointer;
-    background-color: #4CAF50; /* A fresh, vibrant green */
+    background-color: #ff4500;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     font-size: 16px;
     transition: background-color 0.3s ease;
+    font-family: 'Roboto', sans-serif; /* Use the same font as body */
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #ff5e14;
 }
 
 table {
@@ -36,33 +41,41 @@ table {
 
 th, td {
     text-align: left;
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
+    padding: 12px;
+    border-bottom: 1px solid #666;
+    font-family: 'Roboto', sans-serif; /* Use the same font as body */
 }
 
 th {
-    background-color: #4CAF50;
+    background-color: #ff4500;
     color: white;
 }
 
-/* Add alternating background colors to table rows */
 tr:nth-child(even) {
-    background-color: #f2f2f2; /* Light gray background color */
+    background-color: #333;
 }
 
 #summaryChart {
-    background-color: white;
-    padding: 15px;
+    background-color: #444;
+    padding: 20px;
     margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
 }
 
 h3 {
-    color: #333;
+    color: #ff4500;
+    margin-bottom: 10px;
+    font-family: 'Pacifico', cursive; /* Add a fancy cursive font */
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
+/* Responsiveness for smaller screens */
+@media only screen and (max-width: 600px) {
+    input[type="text"], input[type="number"], input[type="datetime-local"] {
+        width: calc(100% - 24px);
+    }
+
+    button {
+        width: 100%;
+    }
 }
