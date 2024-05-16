@@ -143,11 +143,11 @@ async function generateOutcomeChart() {
         outcomeCounts[outcome]++;
     });
 
-    const outcomeChart = new ApexCharts(document.getElementById("outcomeChart"), {
+    const outcomeChart = new ApexCharts(document.getElementById("outcomeChartContainer"), {
         series: Object.values(outcomeCounts),
         chart: {
             type: "donut",
-            width: "300", // Adjust the width of the chart
+            width: "100%", // Adjust the width to occupy the entire container
             height: "300" // Adjust the height of the chart
         },
         labels: Object.keys(outcomeCounts)
@@ -155,7 +155,6 @@ async function generateOutcomeChart() {
 
     outcomeChart.render();
 }
-
 
 async function generateProfitLossChart() {
     const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
@@ -173,13 +172,14 @@ async function generateProfitLossChart() {
         });
     });
 
-    const profitLossChart = new ApexCharts(document.getElementById("profitLossChart"), {
+    const profitLossChart = new ApexCharts(document.getElementById("profitLossChartContainer"), {
         series: [{
             data: profitLossData
         }],
         chart: {
             type: "line",
-            height: 350
+            width: "100%", // Adjust the width to occupy the entire container
+            height: "300" // Adjust the height of the chart
         },
         xaxis: {
             type: "datetime"
@@ -200,8 +200,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         addBetButton.addEventListener('click', addBet);
     }
     await displayBets();
-    await generateReports();
+    await generateOutcomeChart();
+    await generateProfitLossChart();
 });
+
 
 // Event listener to load existing bets and set up the application
 document.addEventListener('DOMContentLoaded', () => {
