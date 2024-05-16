@@ -35,51 +35,41 @@ async function addBet() {
 
 // Function to display bets in a table
 async function displayBets() {
-    // Add an orderBy clause to the query to sort by the 'date' field in ascending order
     const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
-    betsTable.innerHTML = ''; // Clear current bets
-    let totalStaked = 0;
-    let totalReturned = 0;
+    betsTable.innerHTML = '';
 
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
         const row = betsTable.insertRow();
+        row.setAttribute('id', `row-${doc.id}`);
+        row.setAttribute('data-editable', false); // New attribute to track edit state
 
-        row.insertCell().textContent = bet.name;
-        row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
-        row.insertCell().textContent = bet.odds;
-        row.insertCell().textContent = bet.date; // Display the date/time
-        row.insertCell().textContent = bet.outcome;
-        row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
-    
-        const actionsCell = row.insertCell();
-        if (bet.outcome === 'Pending') {
-            const outcomeSelect = document.createElement('select');
-            ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
-                const option = document.createElement('option');
-                option.value = outcome;
-                option.textContent = outcome;
-                option.selected = outcome === bet.outcome;
-                outcomeSelect.appendChild(option);
-            });
-            actionsCell.appendChild(outcomeSelect);
+        if (row.getAttribute('data-editable') === 'true') {
+            // If in edit mode, display input fields
+            row.insertCell().innerHTML = `<input type="text" id="name-${doc.id}" value="${bet.name}">`;
+            row.insertCell().innerHTML = `<input type="number" id="amount-${doc.id}" value="${bet.amount.toFixed(2)}">`;
+            row.insertCell().innerHTML = `<input type="text" id="odds-${doc.id}" value="${bet.odds}">`;
+            row.insertCell().innerHTML = `<input type="date" id="date-${doc.id}" value="${bet.date}">`;
+            row.insertCell().innerHTML = `<button onclick="saveUpdatedBet('${doc.id}')">Save</button>`;
+        } else {
+            // Display regular text
+            row.insertCell().textContent = bet.name;
+            row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+            row.insertCell().textContent = bet.odds;
+            row.insertCell().textContent = bet.date;
 
-            const returnInput = document.createElement('input');
-            returnInput.type = 'number';
-            returnInput.value = bet.returns;
-            actionsCell.appendChild(returnInput);
-
-            const saveButton = document.createElement('button');
-            saveButton.textContent = 'Save Changes';
-            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
-            actionsCell.appendChild(saveButton);
+            // Add edit button
+            const editButtonCell = row.insertCell();
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.onclick = () => toggleEditMode(doc.id);
+            editButtonCell.appendChild(editButton);
         }
-
-        totalStaked += parseFloat(bet.amount);
-        totalReturned += parseFloat(bet.returns);
     });
+}
+
 
     // Update sidebar summary
     document.getElementById('totalStaked').textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
