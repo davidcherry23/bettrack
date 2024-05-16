@@ -213,37 +213,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     displayBets();
 });
-
-
-// Function to switch between tabs
-function openTab(event, tabName) {
-    // Hide all tab contents
-    const tabContents = document.getElementsByClassName("tabcontent");
-    for (let i = 0; i < tabContents.length; i++) {
-        tabContents[i].style.display = "none";
-    }
-
-    // Deactivate all tab links
-    const tabLinks = document.getElementsByClassName("tablinks");
-    for (let i = 0; i < tabLinks.length; i++) {
-        tabLinks[i].classList.remove("active");
-    }
-
-    // Show the selected tab content
-    document.getElementById(tabName).style.display = "block";
-
-    // Activate the clicked tab link
-    event.currentTarget.classList.add("active");
-
-    // Call the displayBets function based on the selected tab
-    if (tabName === "openBets") {
-        displayBets();
-    } else if (tabName === "settledBets") {
-        // Your logic to display settled bets goes here
-    }
-}
-
-// Set the default tab on page load
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("defaultOpenTab").click();
-});
