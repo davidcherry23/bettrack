@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Bet Tracker</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
     <div id="summaryChart" style="position: fixed; top: 20px; right: 20px;">
@@ -36,6 +37,14 @@
         <tbody>
         </tbody>
     </table>
+
+    <!-- Report Section -->
+    <div id="reportSection">
+        <h3>Bet Outcome Distribution</h3>
+        <div id="outcomeChart"></div>
+        <h3>Profit/Loss Over Time</h3>
+        <div id="profitLossChart"></div>
+    </div>
 
     <script type="module" src="app.js"></script>
 </body>
