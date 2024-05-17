@@ -5,10 +5,15 @@ import { collection, addDoc, getDocs, query, doc, updateDoc, orderBy } from "htt
 // Function to add a new bet
 async function addBet() {
     // Retrieve input values
-    const betName = document.getElementById('betName').value;
-    const betAmount = document.getElementById('betAmount').value;
-    const betOdds = document.getElementById('betOdds').value;
-    const betDate = document.getElementById('betDate').value; // Get the date/time input value
+    const betNameInput = document.getElementById('betName');
+    const betAmountInput = document.getElementById('betAmount');
+    const betOddsInput = document.getElementById('betOdds');
+    const betDateInput = document.getElementById('betDate');
+
+    const betName = betNameInput.value;
+    const betAmount = betAmountInput.value;
+    const betOdds = betOddsInput.value;
+    const betDate = betDateInput.value; // Get the date/time input value
 
     // Validate input fields
     if (betName.trim() === '') {
@@ -41,6 +46,11 @@ async function addBet() {
         });
         alert('Bet added successfully!');
         displayBets(); // Refresh the list of bets
+
+        // Clear input fields except for date and time
+        betNameInput.value = '';
+        betAmountInput.value = '';
+        betOddsInput.value = '';
     } catch (error) {
         console.error('Error adding bet: ', error);
         alert('Error adding bet: ' + error.message);
