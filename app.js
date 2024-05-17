@@ -57,9 +57,10 @@ async function displayBets() {
     const profitLossElement = document.getElementById('profitLoss');
     const longestLosingStreakElement = document.getElementById('longestLosingStreak');
     const wonPlacedLostElement = document.getElementById('wonPlacedLost'); // New element for Won-Placed-Lost
+    const unsettledBetsElement = document.getElementById('unsettledBets'); // New element for Unsettled bets
 
     // Check if any required elements are null
-    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement) {
+    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement || !unsettledBetsElement) {
         console.error("One or more elements not found.");
         return;
     }
@@ -71,6 +72,7 @@ async function displayBets() {
     let wonCount = 0;
     let placedCount = 0;
     let lostCount = 0;
+    let unsettledCount = 0; // Initialize count for unsettled bets
 
     // Iterate over each bet document
     querySnapshot.forEach((doc) => {
@@ -109,6 +111,9 @@ async function displayBets() {
             // Attach event listener to save changes
             saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
             actionsCell.appendChild(saveButton);
+
+            // Increment unsettled count for unsettled bets
+            unsettledCount++;
         }
 
         // Update totals
@@ -130,6 +135,7 @@ async function displayBets() {
     profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
     wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
+    unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`; // Update unsettled bets count
 }
 
 // Function to save changes to a bet
@@ -149,7 +155,8 @@ async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInpu
         returnInput.disabled = true;
         saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
     } catch (error) {
-        console.error('Error updating bet: ', error);
+        console.error('Error updating bet: ', error
+);
         alert('Error updating bet');
     }
 }
