@@ -9,11 +9,13 @@ async function addBet() {
     const betAmountInput = document.getElementById('betAmount');
     const betOddsInput = document.getElementById('betOdds');
     const betDateInput = document.getElementById('betDate');
+    const racecourseSelect = document.getElementById('racecourse'); // Update to select element
 
     const betName = betNameInput.value;
     const betAmount = betAmountInput.value;
     const betOdds = betOddsInput.value;
     const betDate = betDateInput.value; // Get the date/time input value
+    const racecourse = racecourseSelect.value; // Get the selected racecourse
 
     // Validate input fields
     if (betName.trim() === '') {
@@ -33,6 +35,10 @@ async function addBet() {
         alert('Please select a date and time');
         return;
     }
+    if (racecourse.trim() === '') { // Ensure a racecourse is provided
+        alert('Please select a racecourse');
+        return;
+    }
 
     try {
         // Add bet document to Firestore
@@ -42,7 +48,8 @@ async function addBet() {
             odds: betOdds,
             date: betDate, // Store date/time
             outcome: "Pending",
-            returns: 0
+            returns: 0,
+            racecourse: racecourse // Add racecourse field
         });
         alert('Bet added successfully!');
         displayBets(); // Refresh the list of bets
@@ -51,11 +58,13 @@ async function addBet() {
         betNameInput.value = '';
         betAmountInput.value = '';
         betOddsInput.value = '';
+        racecourseSelect.value = ''; // Clear racecourse input
     } catch (error) {
         console.error('Error adding bet: ', error);
         alert('Error adding bet: ' + error.message);
     }
 }
+
 
 async function displayBets() {
     // Retrieve bets ordered by date
