@@ -8,7 +8,7 @@ async function addBet() {
     const betName = document.getElementById('betName').value;
     const betAmount = document.getElementById('betAmount').value;
     const betOdds = document.getElementById('betOdds').value;
-    const betDate = document.getElementById('betDate').value; // Get the date/time input value
+    const betDate = document.getElementById('betDate').value;
 
     // Validate input fields
     if (betName.trim() === '') {
@@ -48,6 +48,7 @@ async function addBet() {
 }
 
 async function displayBets() {
+    // Retrieve bets ordered by date
     const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
@@ -58,12 +59,13 @@ async function displayBets() {
     const wonPlacedLostElement = document.getElementById('wonPlacedLost');
     const calendarGrid = document.getElementById('calendarGrid');
 
+    // Check if any required elements are null
     if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement || !calendarGrid) {
         console.error("One or more elements not found.");
         return;
     }
 
-    betsTable.innerHTML = ''; 
+    betsTable.innerHTML = ''; // Clear current bets
     let totalStaked = 0;
     let totalReturned = 0;
     const bets = [];
@@ -71,20 +73,23 @@ async function displayBets() {
     let placedCount = 0;
     let lostCount = 0;
 
+    // Iterate over each bet document
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
-        bets.push(bet);
+        bets.push(bet); // Store bet for later use
         const row = betsTable.insertRow();
 
+        // Fill table cells with bet information
         row.insertCell().textContent = bet.name;
         row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
         row.insertCell().textContent = bet.odds;
-        row.insertCell().textContent = bet.date;
+        row.insertCell().textContent = bet.date; // Display the date/time
         row.insertCell().textContent = bet.outcome;
         row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
 
         const actionsCell = row.insertCell();
         if (bet.outcome === 'Pending') {
+            // Allow editing for pending bets
             const outcomeSelect = document.createElement('select');
             ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
                 const option = document.createElement('option');
@@ -102,73 +107,20 @@ async function displayBets() {
 
             const saveButton = document.createElement('button');
             saveButton.textContent = 'Save Changes';
+            // Attach event listener to save changes
             saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
             actionsCell.appendChild(saveButton);
         }
 
+        // Update totals
         totalStaked += parseFloat(bet.amount);
         totalReturned += parseFloat(bet.returns);
 
+        // Count outcomes
         if (bet.outcome === 'Won') wonCount++;
         if (bet.outcome === 'Placed') placedCount++;
         if (bet.outcome === 'Lost') lostCount++;
     });
-
-    const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
-
-    totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
-    totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
-    profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
-    longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
-    wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
-
-    generateDailyProfitLossCalendar(bets);
-}
-
-// Function to generate the calendar and display daily profit/loss
-function generateDailyProfitLossCalendar(bets) {
-    const calendarGrid = document.getElementById('calendarGrid');
-    calendarGrid.innerHTML = '';
-
-    const dailyPL = Array(31).fill(0);
-
-    bets.forEach(bet => {
-        const date = new Date(bet.date);
-        const day = date.getDate() - 1;
-        dailyPL[day] += parseFloat(bet.returns) - parseFloat(bet.amount);
-    });
-
-    for (let i = 0; i < 31; i++) {
-        const dayContainer = document.createElement('div');
-        dayContainer.style.border = '1px solid #ccc';
-        dayContainer.style.padding = '10px';
-        dayContainer.style.textAlign = 'center';
-
-        const dayLabel = document.createElement('div');
-        dayLabel.textContent = i + 1;
-        dayLabel.style.fontWeight = 'bold';
-
-        const plLabel = document.createElement('div');
-        plLabel.textContent = `$${dailyPL[i].toFixed(2)}`;
-        plLabel.style.color = dailyPL[i] >= 0 ? 'green' : 'red';
-
-        dayContainer.appendChild(dayLabel);
-        dayContainer.appendChild(plLabel);
-
-        calendarGrid.appendChild(dayContainer);
-    }
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-    const addBetButton = document.getElementById('addBetButton');
-    if (addBetButton) {
-        addBetButton.addEventListener('click', addBet);
-    }
-    await displayBets();
-    await generateOutcomeChart();
-    await generateProfitLossChart();
-});
-
 
     // Calculate the longest losing streak
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
@@ -179,6 +131,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
     wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
+
+    // Generate the daily profit/loss calendar
+    generateDailyProfitLossCalendar(bets);
 }
 
 // Function to save changes to a bet
@@ -268,7 +223,7 @@ async function generateProfitLossChart() {
             y: runningTotal
         });
     });
-
+    
     // Render line chart
     const profitLossChart = new ApexCharts(document.getElementById("profitLossChartContainer"), {
         series: [{
