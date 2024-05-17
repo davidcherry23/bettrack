@@ -47,6 +47,45 @@ async function addBet() {
     }
 }
 
+// Function to generate the calendar and display daily profit/loss
+function generateDailyProfitLossCalendar(bets) {
+    const calendarGrid = document.getElementById('calendarGrid');
+    calendarGrid.innerHTML = ''; // Clear previous content
+
+    // Create an array to store profit/loss for each day
+    const dailyPL = Array(31).fill(0);
+
+    // Calculate profit/loss for each day
+    bets.forEach(bet => {
+        const date = new Date(bet.date);
+        const day = date.getDate() - 1; // Get day of the month (0-indexed)
+        dailyPL[day] += parseFloat(bet.returns) - parseFloat(bet.amount);
+    });
+
+    // Create grid items for each day
+    for (let i = 0; i < 31; i++) {
+        const dayContainer = document.createElement('div');
+        dayContainer.style.border = '1px solid #ccc';
+        dayContainer.style.padding = '10px';
+        dayContainer.style.textAlign = 'center';
+
+        const dayLabel = document.createElement('div');
+        dayLabel.textContent = i + 1;
+        dayLabel.style.fontWeight = 'bold';
+
+        const plLabel = document.createElement('div');
+        plLabel.textContent = `$${dailyPL[i].toFixed(2)}`;
+        plLabel.style.color = dailyPL[i] >= 0 ? 'green' : 'red';
+
+        dayContainer.appendChild(dayLabel);
+        dayContainer.appendChild(plLabel);
+
+        calendarGrid.appendChild(dayContainer);
+    }
+}
+
+
+
 async function displayBets() {
     // Retrieve bets ordered by date
     const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
