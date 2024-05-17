@@ -8,7 +8,7 @@ async function addBet() {
     const betName = document.getElementById('betName').value;
     const betAmount = document.getElementById('betAmount').value;
     const betOdds = document.getElementById('betOdds').value;
-    const betDate = document.getElementById('betDate').value;
+    const betDate = document.getElementById('betDate').value; // Get the date/time input value
 
     // Validate input fields
     if (betName.trim() === '') {
@@ -56,11 +56,10 @@ async function displayBets() {
     const totalReturnedElement = document.getElementById('totalReturned');
     const profitLossElement = document.getElementById('profitLoss');
     const longestLosingStreakElement = document.getElementById('longestLosingStreak');
-    const wonPlacedLostElement = document.getElementById('wonPlacedLost');
-    const calendarGrid = document.getElementById('calendarGrid');
+    const wonPlacedLostElement = document.getElementById('wonPlacedLost'); // New element for Won-Placed-Lost
 
     // Check if any required elements are null
-    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement || !calendarGrid) {
+    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement) {
         console.error("One or more elements not found.");
         return;
     }
@@ -116,7 +115,7 @@ async function displayBets() {
         totalStaked += parseFloat(bet.amount);
         totalReturned += parseFloat(bet.returns);
 
-        // Count outcomes
+        // Update counts for Won, Placed, and Lost
         if (bet.outcome === 'Won') wonCount++;
         if (bet.outcome === 'Placed') placedCount++;
         if (bet.outcome === 'Lost') lostCount++;
@@ -131,9 +130,6 @@ async function displayBets() {
     profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
     wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
-
-    // Generate the daily profit/loss calendar
-    generateDailyProfitLossCalendar(bets);
 }
 
 // Function to save changes to a bet
@@ -223,7 +219,7 @@ async function generateProfitLossChart() {
             y: runningTotal
         });
     });
-    
+
     // Render line chart
     const profitLossChart = new ApexCharts(document.getElementById("profitLossChartContainer"), {
         series: [{
