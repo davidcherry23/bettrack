@@ -47,22 +47,97 @@ async function addBet() {
     }
 }
 
+async function displayBets() {
+    const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
+    const querySnapshot = await getDocs(betsQuery);
+    const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
+    const totalStakedElement = document.getElementById('totalStaked');
+    const totalReturnedElement = document.getElementById('totalReturned');
+    const profitLossElement = document.getElementById('profitLoss');
+    const longestLosingStreakElement = document.getElementById('longestLosingStreak');
+    const wonPlacedLostElement = document.getElementById('wonPlacedLost');
+    const calendarGrid = document.getElementById('calendarGrid');
+
+    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement || !calendarGrid) {
+        console.error("One or more elements not found.");
+        return;
+    }
+
+    betsTable.innerHTML = ''; 
+    let totalStaked = 0;
+    let totalReturned = 0;
+    const bets = [];
+    let wonCount = 0;
+    let placedCount = 0;
+    let lostCount = 0;
+
+    querySnapshot.forEach((doc) => {
+        const bet = doc.data();
+        bets.push(bet);
+        const row = betsTable.insertRow();
+
+        row.insertCell().textContent = bet.name;
+        row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+        row.insertCell().textContent = bet.odds;
+        row.insertCell().textContent = bet.date;
+        row.insertCell().textContent = bet.outcome;
+        row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
+
+        const actionsCell = row.insertCell();
+        if (bet.outcome === 'Pending') {
+            const outcomeSelect = document.createElement('select');
+            ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
+                const option = document.createElement('option');
+                option.value = outcome;
+                option.textContent = outcome;
+                option.selected = outcome === bet.outcome;
+                outcomeSelect.appendChild(option);
+            });
+            actionsCell.appendChild(outcomeSelect);
+
+            const returnInput = document.createElement('input');
+            returnInput.type = 'number';
+            returnInput.value = bet.returns;
+            actionsCell.appendChild(returnInput);
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save Changes';
+            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
+            actionsCell.appendChild(saveButton);
+        }
+
+        totalStaked += parseFloat(bet.amount);
+        totalReturned += parseFloat(bet.returns);
+
+        if (bet.outcome === 'Won') wonCount++;
+        if (bet.outcome === 'Placed') placedCount++;
+        if (bet.outcome === 'Lost') lostCount++;
+    });
+
+    const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
+
+    totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+    totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
+    profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+    longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
+    wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
+
+    generateDailyProfitLossCalendar(bets);
+}
+
 // Function to generate the calendar and display daily profit/loss
 function generateDailyProfitLossCalendar(bets) {
     const calendarGrid = document.getElementById('calendarGrid');
-    calendarGrid.innerHTML = ''; // Clear previous content
+    calendarGrid.innerHTML = '';
 
-    // Create an array to store profit/loss for each day
     const dailyPL = Array(31).fill(0);
 
-    // Calculate profit/loss for each day
     bets.forEach(bet => {
         const date = new Date(bet.date);
-        const day = date.getDate() - 1; // Get day of the month (0-indexed)
+        const day = date.getDate() - 1;
         dailyPL[day] += parseFloat(bet.returns) - parseFloat(bet.amount);
     });
 
-    // Create grid items for each day
     for (let i = 0; i < 31; i++) {
         const dayContainer = document.createElement('div');
         dayContainer.style.border = '1px solid #ccc';
@@ -84,81 +159,16 @@ function generateDailyProfitLossCalendar(bets) {
     }
 }
 
-
-
-async function displayBets() {
-    // Retrieve bets ordered by date
-    const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
-    const querySnapshot = await getDocs(betsQuery);
-    const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
-    const totalStakedElement = document.getElementById('totalStaked');
-    const totalReturnedElement = document.getElementById('totalReturned');
-    const profitLossElement = document.getElementById('profitLoss');
-    const longestLosingStreakElement = document.getElementById('longestLosingStreak');
-    const wonPlacedLostElement = document.getElementById('wonPlacedLost'); // New element for Won-Placed-Lost
-
-    // Check if any required elements are null
-    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement) {
-        console.error("One or more elements not found.");
-        return;
+document.addEventListener('DOMContentLoaded', async () => {
+    const addBetButton = document.getElementById('addBetButton');
+    if (addBetButton) {
+        addBetButton.addEventListener('click', addBet);
     }
+    await displayBets();
+    await generateOutcomeChart();
+    await generateProfitLossChart();
+});
 
-    betsTable.innerHTML = ''; // Clear current bets
-    let totalStaked = 0;
-    let totalReturned = 0;
-    const bets = [];
-    let wonCount = 0;
-    let placedCount = 0;
-    let lostCount = 0;
-
-    // Iterate over each bet document
-    querySnapshot.forEach((doc) => {
-        const bet = doc.data();
-        bets.push(bet); // Store bet for later use
-        const row = betsTable.insertRow();
-
-        // Fill table cells with bet information
-        row.insertCell().textContent = bet.name;
-        row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
-        row.insertCell().textContent = bet.odds;
-        row.insertCell().textContent = bet.date; // Display the date/time
-        row.insertCell().textContent = bet.outcome;
-        row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
-
-        const actionsCell = row.insertCell();
-        if (bet.outcome === 'Pending') {
-            // Allow editing for pending bets
-            const outcomeSelect = document.createElement('select');
-            ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
-                const option = document.createElement('option');
-                option.value = outcome;
-                option.textContent = outcome;
-                option.selected = outcome === bet.outcome;
-                outcomeSelect.appendChild(option);
-            });
-            actionsCell.appendChild(outcomeSelect);
-
-            const returnInput = document.createElement('input');
-            returnInput.type = 'number';
-            returnInput.value = bet.returns;
-            actionsCell.appendChild(returnInput);
-
-            const saveButton = document.createElement('button');
-            saveButton.textContent = 'Save Changes';
-            // Attach event listener to save changes
-            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
-            actionsCell.appendChild(saveButton);
-        }
-
-        // Update totals
-        totalStaked += parseFloat(bet.amount);
-        totalReturned += parseFloat(bet.returns);
-
-        // Update counts for Won, Placed, and Lost
-        if (bet.outcome === 'Won') wonCount++;
-        if (bet.outcome === 'Placed') placedCount++;
-        if (bet.outcome === 'Lost') lostCount++;
-    });
 
     // Calculate the longest losing streak
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
