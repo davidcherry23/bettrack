@@ -56,9 +56,10 @@ async function displayBets() {
     const totalReturnedElement = document.getElementById('totalReturned');
     const profitLossElement = document.getElementById('profitLoss');
     const longestLosingStreakElement = document.getElementById('longestLosingStreak');
+    const wonPlacedLostElement = document.getElementById('wonPlacedLost'); // New element for Won-Placed-Lost
 
     // Check if any required elements are null
-    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement) {
+    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement) {
         console.error("One or more elements not found.");
         return;
     }
@@ -67,6 +68,9 @@ async function displayBets() {
     let totalStaked = 0;
     let totalReturned = 0;
     const bets = [];
+    let wonCount = 0;
+    let placedCount = 0;
+    let lostCount = 0;
 
     // Iterate over each bet document
     querySnapshot.forEach((doc) => {
@@ -110,6 +114,11 @@ async function displayBets() {
         // Update totals
         totalStaked += parseFloat(bet.amount);
         totalReturned += parseFloat(bet.returns);
+
+        // Update counts for Won, Placed, and Lost
+        if (bet.outcome === 'Won') wonCount++;
+        if (bet.outcome === 'Placed') placedCount++;
+        if (bet.outcome === 'Lost') lostCount++;
     });
 
     // Calculate the longest losing streak
@@ -120,7 +129,9 @@ async function displayBets() {
     totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
+    wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
 }
+
 // Function to save changes to a bet
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
