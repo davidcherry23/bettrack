@@ -1,6 +1,6 @@
 // Assuming Firebase and Firestore are correctly configured and imported in another module
 import { db } from './firebaseConfig.js';
-import { collection, addDoc, getDocs, query, doc, updateDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, query, doc, updateDoc, orderBy, limit, startAfter } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Function to add a new bet
 async function addBet() {
@@ -47,9 +47,17 @@ async function addBet() {
     }
 }
 
-async function displayBets() {
-    // Retrieve bets ordered by date
-    const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
+let lastVisibleDoc = null; // Keep track of the last visible document for pagination
+
+async function displayBets(loadMore = false) {
+    // Determine query based on whether we are loading more bets or starting fresh
+    let betsQuery;
+    if (loadMore && lastVisibleDoc) {
+        betsQuery = query(collection(db, "bets"), orderBy("date", "desc"), startAfter(lastVisibleDoc), limit(30));
+    } else {
+        betsQuery = query(collection(db, "bets"), orderBy("date", "desc"), limit(30));
+    }
+
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
     const totalStakedElement = document.getElementById('totalStaked');
@@ -65,7 +73,10 @@ async function displayBets() {
         return;
     }
 
-    betsTable.innerHTML = ''; // Clear current bets
+    if (!loadMore) {
+        betsTable.innerHTML = ''; // Clear current bets if not loading more
+    }
+    
     let totalStaked = 0;
     let totalReturned = 0;
     const bets = [];
@@ -126,6 +137,11 @@ async function displayBets() {
         if (bet.outcome === 'Lost') lostCount++;
     });
 
+    // Update the last visible document for pagination
+    if (!querySnapshot.empty) {
+        lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+    }
+
     // Calculate the longest losing streak
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
 
@@ -136,6 +152,12 @@ async function displayBets() {
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
     wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`; // Update unsettled bets count
+
+    // Show the "Load More" button if there are more bets to load
+    const loadMoreButton = document.getElementById('loadMoreButton');
+    if (loadMoreButton) {
+        loadMoreButton.style.display = querySnapshot.size === 30 ? 'block' : 'none';
+    }
 }
 
 // Function to save changes to a bet
@@ -155,8 +177,7 @@ async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInpu
         returnInput.disabled = true;
         saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
     } catch (error) {
-        console.error('Error updating bet: ', error
-);
+        console.error('Error updating bet: ', error);
         alert('Error updating bet');
     }
 }
