@@ -269,7 +269,6 @@ async function generateProfitLossChart() {
 }
 
 
-
 // Event listener to load existing bets and set up the application
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
