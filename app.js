@@ -48,22 +48,6 @@ async function addBet() {
 }
 
 
-// Attach an event listener to the search input field
-document.addEventListener('DOMContentLoaded', async () => {
-    const addBetButton = document.getElementById('addBetButton');
-    const searchInput = document.getElementById('searchInput');
-    if (addBetButton) {
-        addBetButton.addEventListener('click', addBet);
-    }
-    if (searchInput) {
-        searchInput.addEventListener('input', displayBets);
-    }
-    // Display existing bets and generate charts
-    await displayBets();
-    await generateOutcomeChart();
-    await generateProfitLossChart();
-});
-
 // Modify the displayBets function to apply the search filter
 async function displayBets() {
     // Retrieve bets ordered by date
@@ -101,13 +85,7 @@ async function displayBets() {
             const row = betsTable.insertRow();
 
             // Fill table cells with bet information
-            const nameCell = row.insertCell();
-            nameCell.textContent = bet.name;
-            const editButton = document.createElement('button');
-            editButton.textContent = 'Edit';
-            editButton.onclick = () => enterEditMode(nameCell); // Enter edit mode when the button is clicked
-            nameCell.appendChild(editButton); // Append the edit button to the cell
-
+            row.insertCell().textContent = bet.name;
             row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
             row.insertCell().textContent = bet.odds;
             row.insertCell().textContent = bet.date;
@@ -158,10 +136,29 @@ async function displayBets() {
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
 
-// Function to enter edit mode for a specific cell
-function enterEditMode(cell) {
-    cell.contentEditable = 'true'; // Allow editing for the cell
-    cell.focus(); // Set focus to the cell
+
+// Function to save changes to a bet
+async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
+    const betRef = doc(db, "bets", betId);
+    try {
+        // Update bet document in Firestore
+        await updateDoc(betRef, {
+            outcome: outcome,
+            returns: parseFloat(returns)
+        });
+        alert('Bet updated successfully!');
+        displayBets(); // Refresh the list to reflect changes
+
+        // Optionally, disable fields immediately to show the bet is settled
+        outcomeSelect.disabled = true;
+        returnInput.disabled = true;
+        saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
+    } catch (error) {
+        console.error('Error updating bet: ', error
+);
+        alert('Error updating bet');
+    }
+}
 
 // Function to calculate the longest losing streak based on date and time
 function calculateLongestLosingStreakByDateTime(bets) {
@@ -255,14 +252,6 @@ async function generateProfitLossChart() {
     profitLossChart.render();
 }
 
-// Function to set up the application
-async function setupApplication() {
-    // Display existing bets and generate charts
-    await displayBets();
-    await generateOutcomeChart();
-    await generateProfitLossChart();
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
     const searchInput = document.getElementById('searchInput');
@@ -276,3 +265,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Display existing bets and generate charts only once
     await setupApplication();
 });
+
+// Function to set up the application
+async function setupApplication() {
+    // Display existing bets and generate charts
+    await displayBets();
+    await generateOutcomeChart();
+    await generateProfitLossChart();
+}
