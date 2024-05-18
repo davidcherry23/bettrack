@@ -1,36 +1,54 @@
+// Assuming Firebase and Firestore are correctly configured and imported in another module
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, query, doc, updateDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Function to add a new bet
 async function addBet() {
+    // Retrieve input values
     const betName = document.getElementById('betName').value;
     const betAmount = document.getElementById('betAmount').value;
     const betOdds = document.getElementById('betOdds').value;
-    const betDate = document.getElementById('betDate').value;
+    const betDate = document.getElementById('betDate').value; // Get the date/time input value
 
-    if (betName.trim() === '' || isNaN(parseFloat(betAmount)) || parseFloat(betAmount) <= 0 || betOdds.trim() === '' || betDate.trim() === '') {
-        alert('Please enter valid bet details');
+    // Validate input fields
+    if (betName.trim() === '') {
+        alert('Please enter a bet name');
+        return;
+    }
+    const parsedAmount = parseFloat(betAmount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+        alert('Please enter a valid bet amount');
+        return;
+    }
+    if (betOdds.trim() === '') {
+        alert('Please enter the odds');
+        return;
+    }
+    if (betDate.trim() === '') {
+        alert('Please select a date and time');
         return;
     }
 
     try {
+        // Add bet document to Firestore
         await addDoc(collection(db, "bets"), {
             name: betName,
-            amount: parseFloat(betAmount),
+            amount: parsedAmount, // Store as a float
             odds: betOdds,
-            date: betDate,
+            date: betDate, // Store date/time
             outcome: "Pending",
             returns: 0
         });
         alert('Bet added successfully!');
-        displayBets();
+        displayBets(); // Refresh the list of bets
     } catch (error) {
         console.error('Error adding bet: ', error);
         alert('Error adding bet: ' + error.message);
     }
 }
 
-async function displayBets(searchQuery = '') {
+async function displayBets() {
+    // Retrieve bets ordered by date
     const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
@@ -38,137 +56,114 @@ async function displayBets(searchQuery = '') {
     const totalReturnedElement = document.getElementById('totalReturned');
     const profitLossElement = document.getElementById('profitLoss');
     const longestLosingStreakElement = document.getElementById('longestLosingStreak');
-    const wonPlacedLostElement = document.getElementById('wonPlacedLost');
-    const unsettledBetsElement = document.getElementById('unsettledBets');
+    const wonPlacedLostElement = document.getElementById('wonPlacedLost'); // New element for Won-Placed-Lost
+    const unsettledBetsElement = document.getElementById('unsettledBets'); // New element for Unsettled bets
 
+    // Check if any required elements are null
     if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement || !unsettledBetsElement) {
         console.error("One or more elements not found.");
         return;
     }
 
-    betsTable.innerHTML = '';
+    betsTable.innerHTML = ''; // Clear current bets
     let totalStaked = 0;
     let totalReturned = 0;
     const bets = [];
     let wonCount = 0;
     let placedCount = 0;
     let lostCount = 0;
-    let unsettledCount = 0;
+    let unsettledCount = 0; // Initialize count for unsettled bets
 
+    // Iterate over each bet document
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
-        if (searchQuery && !bet.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-            return;
-        }
-        bets.push({ ...bet, id: doc.id });
+        bets.push(bet); // Store bet for later use
         const row = betsTable.insertRow();
 
-        const nameCell = row.insertCell();
-        nameCell.textContent = bet.name;
-        nameCell.setAttribute('data-id', doc.id);
-
-        const amountCell = row.insertCell();
-        amountCell.textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
-
-        const oddsCell = row.insertCell();
-        oddsCell.textContent = bet.odds;
-
-        const dateCell = row.insertCell();
-        dateCell.textContent = bet.date;
-
-        const outcomeCell = row.insertCell();
-        outcomeCell.textContent = bet.outcome;
-        if (bet.outcome === 'Pending') {
-            const settleButton = document.createElement('button');
-            settleButton.textContent = 'Settle';
-            settleButton.addEventListener('click', () => settleBet(doc.id));
-            outcomeCell.appendChild(settleButton);
-        }
-
-        const returnsCell = row.insertCell();
-        returnsCell.textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
+        // Fill table cells with bet information
+        row.insertCell().textContent = bet.name;
+        row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+        row.insertCell().textContent = bet.odds;
+        row.insertCell().textContent = bet.date; // Display the date/time
+        row.insertCell().textContent = bet.outcome;
+        row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
 
         const actionsCell = row.insertCell();
-        const editButton = document.createElement('button');
-        editButton.textContent = 'Edit';
-        editButton.addEventListener('click', () => enableEditMode(row));
-        actionsCell.appendChild(editButton);
+        if (bet.outcome === 'Pending') {
+            // Allow editing for pending bets
+            const outcomeSelect = document.createElement('select');
+            ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
+                const option = document.createElement('option');
+                option.value = outcome;
+                option.textContent = outcome;
+                option.selected = outcome === bet.outcome;
+                outcomeSelect.appendChild(option);
+            });
+            actionsCell.appendChild(outcomeSelect);
 
+            const returnInput = document.createElement('input');
+            returnInput.type = 'number';
+            returnInput.value = bet.returns;
+            actionsCell.appendChild(returnInput);
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save Changes';
+            // Attach event listener to save changes
+            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
+            actionsCell.appendChild(saveButton);
+
+            // Increment unsettled count for unsettled bets
+            unsettledCount++;
+        }
+
+        // Update totals
         totalStaked += parseFloat(bet.amount);
         totalReturned += parseFloat(bet.returns);
 
+        // Update counts for Won, Placed, and Lost
         if (bet.outcome === 'Won') wonCount++;
         if (bet.outcome === 'Placed') placedCount++;
         if (bet.outcome === 'Lost') lostCount++;
-        if (bet.outcome === 'Pending') unsettledCount++;
     });
 
+    // Calculate the longest losing streak
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
 
+    // Update the summary with calculated values
     totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
     wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
-    unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
+    unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`; // Update unsettled bets count
 }
 
-function enableEditMode(row) {
-    const cells = row.cells;
-    for (let i = 0; i < cells.length - 1; i++) {
-        cells[i].contentEditable = true;
-    }
-    const saveButton = document.createElement('button');
-    saveButton.textContent = 'Save';
-    saveButton.addEventListener('click', () => saveChanges(row));
-    cells[cells.length - 1].appendChild(saveButton);
-}
-
-async function saveChanges(row) {
-    const cells = row.cells;
-    const betId = cells[0].getAttribute('data-id');
-    const updatedBet = {
-        name: cells[0].textContent,
-        amount: parseFloat(cells[1].textContent.replace('$', '')),
-        odds: cells[2].textContent,
-        date: cells[3].textContent,
-        outcome: cells[4].textContent,
-        returns: parseFloat(cells[5].textContent.replace('$', ''))
-    };
-
+// Function to save changes to a bet
+async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
+    const betRef = doc(db, "bets", betId);
     try {
-        const betRef = doc(db, "bets", betId);
-        await updateDoc(betRef, updatedBet);
+        // Update bet document in Firestore
+        await updateDoc(betRef, {
+            outcome: outcome,
+            returns: parseFloat(returns)
+        });
         alert('Bet updated successfully!');
+        displayBets(); // Refresh the list to reflect changes
+
+        // Optionally, disable fields immediately to show the bet is settled
+        outcomeSelect.disabled = true;
+        returnInput.disabled = true;
+        saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
     } catch (error) {
-        console.error('Error updating bet: ', error);
-        alert('Error updating bet: ' + error.message);
+        console.error('Error updating bet: ', error
+);
+        alert('Error updating bet');
     }
-    displayBets();
 }
 
-async function settleBet(betId) {
-    const outcome = prompt("Enter outcome (Won, Placed, Lost):");
-    const returns = outcome === 'Won' || outcome === 'Placed' ? parseFloat(prompt("Enter returns amount:")) : 0;
-    
-    if (!outcome || (outcome !== 'Won' && outcome !== 'Placed' && outcome !== 'Lost')) {
-        alert('Invalid outcome');
-        return;
-    }
-
-    try {
-        const betRef = doc(db, "bets", betId);
-        await updateDoc(betRef, { outcome, returns });
-        alert('Bet settled successfully!');
-    } catch (error) {
-        console.error('Error settling bet: ', error);
-        alert('Error settling bet: ' + error.message);
-    }
-    displayBets();
-}
-
+// Function to calculate the longest losing streak based on date and time
 function calculateLongestLosingStreakByDateTime(bets) {
-    bets.sort((a, b) => new Date(a.date) - new Date(b.date));
+    bets.sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort bets by date and time
     let longestStreak = 0;
     let currentStreak = 0;
 
@@ -184,6 +179,7 @@ function calculateLongestLosingStreakByDateTime(bets) {
     return longestStreak;
 }
 
+// Function to generate outcome chart
 async function generateOutcomeChart() {
     const betsQuery = query(collection(db, "bets"));
     const querySnapshot = await getDocs(betsQuery);
@@ -194,17 +190,19 @@ async function generateOutcomeChart() {
         Pending: 0
     };
 
+    // Count outcomes
     querySnapshot.forEach(doc => {
         const outcome = doc.data().outcome;
         outcomeCounts[outcome]++;
     });
 
+    // Render donut chart
     const outcomeChart = new ApexCharts(document.getElementById("outcomeChartContainer"), {
         series: Object.values(outcomeCounts),
         chart: {
             type: "donut",
-            width: "100%",
-            height: "300"
+            width: "100%", // Adjust the width to occupy the entire container
+            height: "300" // Adjust the height of the chart
         },
         labels: Object.keys(outcomeCounts)
     });
@@ -212,43 +210,57 @@ async function generateOutcomeChart() {
     outcomeChart.render();
 }
 
+// Function to generate profit/loss chart
 async function generateProfitLossChart() {
     const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
     const querySnapshot = await getDocs(betsQuery);
     const profitLossData = [];
     let runningTotal = 0;
 
+    // Prepare data for the chart
     querySnapshot.forEach(doc => {
         const bet = doc.data();
         runningTotal += parseFloat(bet.returns) - parseFloat(bet.amount);
-        profitLossData.push({ x: new Date(bet.date), y: runningTotal });
+        profitLossData.push({
+            x: new Date(bet.date),
+            y: parseFloat(runningTotal.toFixed(2)) // Ensure values are to 2 decimal places
+        });
     });
 
+    // Render line chart
     const profitLossChart = new ApexCharts(document.getElementById("profitLossChartContainer"), {
         series: [{
-            name: "Profit/Loss",
             data: profitLossData
         }],
         chart: {
             type: "line",
-            width: "100%",
-            height: "300"
+            width: "100%", // Adjust the width to occupy the entire container
+            height: "300" // Adjust the height of the chart
         },
         xaxis: {
             type: "datetime"
+        },
+        yaxis: {
+            title: {
+                text: "Profit/Loss"
+            },
+            labels: {
+                formatter: (val) => `£${val.toFixed(2)}` // Ensure y-axis labels are to 2 decimal places
+            }
         }
     });
 
     profitLossChart.render();
 }
 
+
+// Event listener to load existing bets and set up the application
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
-    const searchInput = document.getElementById('searchInput');
-
-    addBetButton.addEventListener('click', addBet);
-    searchInput.addEventListener('input', () => displayBets(searchInput.value));
-
+    if (addBetButton) {
+        addBetButton.addEventListener('click', addBet);
+    }
+    // Display existing bets and generate charts
     await displayBets();
     await generateOutcomeChart();
     await generateProfitLossChart();
