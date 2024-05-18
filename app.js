@@ -255,6 +255,14 @@ async function generateProfitLossChart() {
     profitLossChart.render();
 }
 
+// Function to set up the application
+async function setupApplication() {
+    // Display existing bets and generate charts
+    await displayBets();
+    await generateOutcomeChart();
+    await generateProfitLossChart();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
     const searchInput = document.getElementById('searchInput');
@@ -268,11 +276,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Display existing bets and generate charts only once
     await setupApplication();
 });
-
-// Function to set up the application
-async function setupApplication() {
-    // Display existing bets and generate charts
-    await displayBets();
-    await generateOutcomeChart();
-    await generateProfitLossChart();
-}
