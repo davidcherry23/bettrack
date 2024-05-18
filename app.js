@@ -48,6 +48,22 @@ async function addBet() {
 }
 
 
+// Attach an event listener to the search input field
+document.addEventListener('DOMContentLoaded', async () => {
+    const addBetButton = document.getElementById('addBetButton');
+    const searchInput = document.getElementById('searchInput');
+    if (addBetButton) {
+        addBetButton.addEventListener('click', addBet);
+    }
+    if (searchInput) {
+        searchInput.addEventListener('input', displayBets);
+    }
+    // Display existing bets and generate charts
+    await displayBets();
+    await generateOutcomeChart();
+    await generateProfitLossChart();
+});
+
 // Modify the displayBets function to apply the search filter
 async function displayBets() {
     // Retrieve bets ordered by date
@@ -94,24 +110,21 @@ async function displayBets() {
 
             const actionsCell = row.insertCell();
             if (bet.outcome === 'Pending') {
-                const outcomeSelect = document.createElement('select');
-                ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
-                    const option = document.createElement('option');
-                    option.value = outcome;
-                    option.textContent = outcome;
-                    option.selected = outcome === bet.outcome;
-                    outcomeSelect.appendChild(option);
-                });
-                actionsCell.appendChild(outcomeSelect);
+                const editButtons = [];
 
-                const returnInput = document.createElement('input');
-                returnInput.type = 'number';
-                returnInput.value = bet.returns;
-                actionsCell.appendChild(returnInput);
+                // Add edit buttons for editable fields
+                ['name', 'amount', 'odds', 'date'].forEach(field => {
+                    const editButton = document.createElement('button');
+                    editButton.textContent = 'Edit';
+                    editButton.onclick = () => enterEditMode(row.cells[field === 'date' ? 3 : row.cells.length - 2]); // Date cell is at index 3, returns cell is at index length - 2
+                    actionsCell.appendChild(editButton);
+                    editButtons.push(editButton);
+                });
 
                 const saveButton = document.createElement('button');
                 saveButton.textContent = 'Save Changes';
-                saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
+                saveButton.style.display = 'none'; // Initially hide the save button
+                saveButton.onclick = () => saveBetChanges(doc.id, editButtons, row.cells[row.cells.length - 2], row.cells[row.cells.length - 1], saveButton); // Pass edit buttons and returns cell
                 actionsCell.appendChild(saveButton);
 
                 unsettledCount++;
@@ -138,26 +151,37 @@ async function displayBets() {
 
 
 // Function to save changes to a bet
-async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
+async function saveBetChanges(betId, editButtons, returnsCell, outcomeCell, saveButton) {
     const betRef = doc(db, "bets", betId);
     try {
-        // Update bet document in Firestore
-        await updateDoc(betRef, {
-            outcome: outcome,
-            returns: parseFloat(returns)
+            // Update bet document in Firestore
+        const newValues = {};
+        editButtons.forEach((button, index) => {
+            const cell = button.parentElement.previousElementSibling; // Get the cell before the edit button
+            if (cell && cell.contentEditable === 'true') {
+                newValues[cell.dataset.field] = cell.textContent.trim(); // Store the new value in the field
+            }
+            cell.contentEditable = 'false'; // Disable editing for the cell
+            button.style.display = 'inline'; // Show the edit button again
         });
+
+        // Update only the fields that were edited
+        await updateDoc(betRef, newValues);
+
+        // Optionally, disable the save button immediately to indicate the changes are saved
+        saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
         alert('Bet updated successfully!');
         displayBets(); // Refresh the list to reflect changes
-
-        // Optionally, disable fields immediately to show the bet is settled
-        outcomeSelect.disabled = true;
-        returnInput.disabled = true;
-        saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
     } catch (error) {
-        console.error('Error updating bet: ', error
-);
+        console.error('Error updating bet: ', error);
         alert('Error updating bet');
     }
+}
+
+// Function to enter edit mode for a specific cell
+function enterEditMode(cell) {
+    cell.contentEditable = 'true'; // Allow editing for the cell
+    cell.focus(); // Set focus to the cell
 }
 
 // Function to calculate the longest losing streak based on date and time
