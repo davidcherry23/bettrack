@@ -1,54 +1,36 @@
-// Assuming Firebase and Firestore are correctly configured and imported in another module
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, query, doc, updateDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Function to add a new bet
 async function addBet() {
-    // Retrieve input values
     const betName = document.getElementById('betName').value;
     const betAmount = document.getElementById('betAmount').value;
     const betOdds = document.getElementById('betOdds').value;
-    const betDate = document.getElementById('betDate').value; // Get the date/time input value
+    const betDate = document.getElementById('betDate').value;
 
-    // Validate input fields
-    if (betName.trim() === '') {
-        alert('Please enter a bet name');
-        return;
-    }
-    const parsedAmount = parseFloat(betAmount);
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-        alert('Please enter a valid bet amount');
-        return;
-    }
-    if (betOdds.trim() === '') {
-        alert('Please enter the odds');
-        return;
-    }
-    if (betDate.trim() === '') {
-        alert('Please select a date and time');
+    if (betName.trim() === '' || isNaN(parseFloat(betAmount)) || parseFloat(betAmount) <= 0 || betOdds.trim() === '' || betDate.trim() === '') {
+        alert('Please enter valid bet details');
         return;
     }
 
     try {
-        // Add bet document to Firestore
         await addDoc(collection(db, "bets"), {
             name: betName,
-            amount: parsedAmount, // Store as a float
+            amount: parseFloat(betAmount),
             odds: betOdds,
-            date: betDate, // Store date/time
+            date: betDate,
             outcome: "Pending",
             returns: 0
         });
         alert('Bet added successfully!');
-        displayBets(); // Refresh the list of bets
+        displayBets();
     } catch (error) {
         console.error('Error adding bet: ', error);
         alert('Error adding bet: ' + error.message);
     }
 }
 
-async function displayBets() {
-    // Retrieve bets ordered by date
+async function displayBets(searchQuery = '') {
     const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
@@ -56,114 +38,108 @@ async function displayBets() {
     const totalReturnedElement = document.getElementById('totalReturned');
     const profitLossElement = document.getElementById('profitLoss');
     const longestLosingStreakElement = document.getElementById('longestLosingStreak');
-    const wonPlacedLostElement = document.getElementById('wonPlacedLost'); // New element for Won-Placed-Lost
-    const unsettledBetsElement = document.getElementById('unsettledBets'); // New element for Unsettled bets
+    const wonPlacedLostElement = document.getElementById('wonPlacedLost');
+    const unsettledBetsElement = document.getElementById('unsettledBets');
 
-    // Check if any required elements are null
     if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement || !unsettledBetsElement) {
         console.error("One or more elements not found.");
         return;
     }
 
-    betsTable.innerHTML = ''; // Clear current bets
+    betsTable.innerHTML = '';
     let totalStaked = 0;
     let totalReturned = 0;
     const bets = [];
     let wonCount = 0;
     let placedCount = 0;
     let lostCount = 0;
-    let unsettledCount = 0; // Initialize count for unsettled bets
+    let unsettledCount = 0;
 
-    // Iterate over each bet document
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
-        bets.push(bet); // Store bet for later use
+        if (searchQuery && !bet.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+            return;
+        }
+        bets.push({ ...bet, id: doc.id });
         const row = betsTable.insertRow();
 
-        // Fill table cells with bet information
-        row.insertCell().textContent = bet.name;
-        row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
-        row.insertCell().textContent = bet.odds;
-        row.insertCell().textContent = bet.date; // Display the date/time
-        row.insertCell().textContent = bet.outcome;
-        row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
+        const nameCell = row.insertCell();
+        nameCell.textContent = bet.name;
+        nameCell.contentEditable = true;
+
+        const amountCell = row.insertCell();
+        amountCell.textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+        amountCell.contentEditable = true;
+
+        const oddsCell = row.insertCell();
+        oddsCell.textContent = bet.odds;
+        oddsCell.contentEditable = true;
+
+        const dateCell = row.insertCell();
+        dateCell.textContent = bet.date;
+        dateCell.contentEditable = true;
+
+        const outcomeCell = row.insertCell();
+        outcomeCell.textContent = bet.outcome;
+        outcomeCell.contentEditable = true;
+
+        const returnsCell = row.insertCell();
+        returnsCell.textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
+        returnsCell.contentEditable = true;
 
         const actionsCell = row.insertCell();
         if (bet.outcome === 'Pending') {
-            // Allow editing for pending bets
-            const outcomeSelect = document.createElement('select');
-            ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
-                const option = document.createElement('option');
-                option.value = outcome;
-                option.textContent = outcome;
-                option.selected = outcome === bet.outcome;
-                outcomeSelect.appendChild(option);
-            });
-            actionsCell.appendChild(outcomeSelect);
-
-            const returnInput = document.createElement('input');
-            returnInput.type = 'number';
-            returnInput.value = bet.returns;
-            actionsCell.appendChild(returnInput);
-
-            const saveButton = document.createElement('button');
-            saveButton.textContent = 'Save Changes';
-            // Attach event listener to save changes
-            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
-            actionsCell.appendChild(saveButton);
-
-            // Increment unsettled count for unsettled bets
             unsettledCount++;
         }
 
-        // Update totals
         totalStaked += parseFloat(bet.amount);
         totalReturned += parseFloat(bet.returns);
 
-        // Update counts for Won, Placed, and Lost
         if (bet.outcome === 'Won') wonCount++;
         if (bet.outcome === 'Placed') placedCount++;
         if (bet.outcome === 'Lost') lostCount++;
     });
 
-    // Calculate the longest losing streak
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
 
-    // Update the summary with calculated values
     totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
     wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
-    unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`; // Update unsettled bets count
+    unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
 
-// Function to save changes to a bet
-async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
-    const betRef = doc(db, "bets", betId);
-    try {
-        // Update bet document in Firestore
-        await updateDoc(betRef, {
-            outcome: outcome,
-            returns: parseFloat(returns)
-        });
-        alert('Bet updated successfully!');
-        displayBets(); // Refresh the list to reflect changes
+async function saveAllChanges() {
+    const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
+    const rows = betsTable.rows;
 
-        // Optionally, disable fields immediately to show the bet is settled
-        outcomeSelect.disabled = true;
-        returnInput.disabled = true;
-        saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
-    } catch (error) {
-        console.error('Error updating bet: ', error
-);
-        alert('Error updating bet');
+    for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].cells;
+        const betId = cells[0].getAttribute('data-id');
+        const updatedBet = {
+            name: cells[0].textContent,
+            amount: parseFloat(cells[1].textContent.replace('$', '')),
+            odds: cells[2].textContent,
+            date: cells[3].textContent,
+            outcome: cells[4].textContent,
+            returns: parseFloat(cells[5].textContent.replace('$', ''))
+        };
+
+        try {
+            const betRef = doc(db, "bets", betId);
+            await updateDoc(betRef, updatedBet);
+        } catch (error) {
+            console.error('Error updating bet: ', error);
+            alert('Error updating bet: ' + error.message);
+        }
     }
+    alert('All changes saved successfully!');
+    displayBets();
 }
 
-// Function to calculate the longest losing streak based on date and time
 function calculateLongestLosingStreakByDateTime(bets) {
-    bets.sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort bets by date and time
+    bets.sort((a, b) => new Date(a.date) - new Date(b.date));
     let longestStreak = 0;
     let currentStreak = 0;
 
@@ -179,7 +155,6 @@ function calculateLongestLosingStreakByDateTime(bets) {
     return longestStreak;
 }
 
-// Function to generate outcome chart
 async function generateOutcomeChart() {
     const betsQuery = query(collection(db, "bets"));
     const querySnapshot = await getDocs(betsQuery);
@@ -190,19 +165,17 @@ async function generateOutcomeChart() {
         Pending: 0
     };
 
-    // Count outcomes
     querySnapshot.forEach(doc => {
         const outcome = doc.data().outcome;
         outcomeCounts[outcome]++;
     });
 
-    // Render donut chart
     const outcomeChart = new ApexCharts(document.getElementById("outcomeChartContainer"), {
         series: Object.values(outcomeCounts),
         chart: {
             type: "donut",
-            width: "100%", // Adjust the width to occupy the entire container
-            height: "300" // Adjust the height of the chart
+            width: "100%",
+            height: "300"
         },
         labels: Object.keys(outcomeCounts)
     });
@@ -210,32 +183,29 @@ async function generateOutcomeChart() {
     outcomeChart.render();
 }
 
-// Function to generate profit/loss chart
 async function generateProfitLossChart() {
     const betsQuery = query(collection(db, "bets"), orderBy("date", "asc"));
     const querySnapshot = await getDocs(betsQuery);
     const profitLossData = [];
     let runningTotal = 0;
 
-    // Prepare data for the chart
     querySnapshot.forEach(doc => {
         const bet = doc.data();
         runningTotal += parseFloat(bet.returns) - parseFloat(bet.amount);
         profitLossData.push({
             x: new Date(bet.date),
-            y: parseFloat(runningTotal.toFixed(2)) // Ensure values are to 2 decimal places
+            y: parseFloat(runningTotal.toFixed(2))
         });
     });
 
-    // Render line chart
     const profitLossChart = new ApexCharts(document.getElementById("profitLossChartContainer"), {
         series: [{
             data: profitLossData
         }],
         chart: {
             type: "line",
-            width: "100%", // Adjust the width to occupy the entire container
-            height: "300" // Adjust the height of the chart
+            width: "100%",
+            height: "300"
         },
         xaxis: {
             type: "datetime"
@@ -245,7 +215,7 @@ async function generateProfitLossChart() {
                 text: "Profit/Loss"
             },
             labels: {
-                formatter: (val) => `£${val.toFixed(2)}` // Ensure y-axis labels are to 2 decimal places
+                formatter: (val) => `£${val.toFixed(2)}`
             }
         }
     });
@@ -253,14 +223,17 @@ async function generateProfitLossChart() {
     profitLossChart.render();
 }
 
-
-// Event listener to load existing bets and set up the application
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
-    if (addBetButton) {
-        addBetButton.addEventListener('click', addBet);
-    }
-    // Display existing bets and generate charts
+    const editButton = document.getElementById('editButton');
+    const saveButton = document.getElementById('saveButton');
+    const searchInput = document.getElementById('searchInput');
+
+    if (addBetButton) addBetButton.addEventListener('click', addBet);
+    if (editButton) editButton.addEventListener('click', () => { document.querySelectorAll('#betsTable td').forEach(cell => cell.contentEditable = true); });
+    if (saveButton) saveButton.addEventListener('click', saveAllChanges);
+    if (searchInput) searchInput.addEventListener('input', () => displayBets(searchInput.value));
+
     await displayBets();
     await generateOutcomeChart();
     await generateProfitLossChart();
