@@ -223,7 +223,7 @@ async function generateProfitLossChart() {
         runningTotal += parseFloat(bet.returns) - parseFloat(bet.amount);
         profitLossData.push({
             x: new Date(bet.date),
-            y: runningTotal
+            y: parseFloat(runningTotal.toFixed(2)) // Ensure values are to 2 decimal places
         });
     });
 
@@ -243,12 +243,16 @@ async function generateProfitLossChart() {
         yaxis: {
             title: {
                 text: "Profit/Loss"
+            },
+            labels: {
+                formatter: (val) => `£${val.toFixed(2)}` // Ensure y-axis labels are to 2 decimal places
             }
         }
     });
 
     profitLossChart.render();
 }
+
 
 // Event listener to load existing bets and set up the application
 document.addEventListener('DOMContentLoaded', async () => {
