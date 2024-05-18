@@ -268,57 +268,6 @@ async function generateProfitLossChart() {
     profitLossChart.render();
 }
 
-// Function to calculate P/L for different time periods
-async function calculateProfitLossReport() {
-    const betsQuery = query(collection(db, "bets"));
-    const querySnapshot = await getDocs(betsQuery);
-    const currentDate = new Date();
-    const dailyStartDate = new Date(currentDate);
-    dailyStartDate.setHours(0, 0, 0, 0); // Start of the current day
-    const weeklyStartDate = new Date(currentDate);
-    weeklyStartDate.setDate(weeklyStartDate.getDate() - currentDate.getDay()); // Start of the current week (Sunday)
-    weeklyStartDate.setHours(0, 0, 0, 0);
-    const monthlyStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // Start of the current month
-    const yearlyStartDate = new Date(currentDate.getFullYear(), 0, 1); // Start of the current year
-
-    let dailyProfitLoss = 0;
-    let weeklyProfitLoss = 0;
-    let monthlyProfitLoss = 0;
-    let yearlyProfitLoss = 0;
-    let allTimeProfitLoss = 0;
-
-    querySnapshot.forEach(doc => {
-        const bet = doc.data();
-        const betDate = new Date(bet.date);
-        const betReturns = parseFloat(bet.returns);
-        const betAmount = parseFloat(bet.amount);
-        
-        allTimeProfitLoss += betReturns - betAmount;
-
-        if (betDate >= dailyStartDate) {
-            dailyProfitLoss += betReturns - betAmount;
-        }
-        if (betDate >= weeklyStartDate) {
-            weeklyProfitLoss += betReturns - betAmount;
-        }
-        if (betDate >= monthlyStartDate) {
-            monthlyProfitLoss += betReturns - betAmount;
-        }
-        if (betDate >= yearlyStartDate) {
-            yearlyProfitLoss += betReturns - betAmount;
-        }
-    });
-
-    // Display the report
-    console.log("Daily P/L:", dailyProfitLoss.toFixed(2));
-    console.log("Weekly P/L:", weeklyProfitLoss.toFixed(2));
-    console.log("Monthly P/L:", monthlyProfitLoss.toFixed(2));
-    console.log("Yearly P/L:", yearlyProfitLoss.toFixed(2));
-    console.log("All-time P/L:", allTimeProfitLoss.toFixed(2));
-}
-
-// Call the function to calculate and display the report
-calculateProfitLossReport();
 
 
 // Event listener to load existing bets and set up the application
