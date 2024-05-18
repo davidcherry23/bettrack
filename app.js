@@ -65,32 +65,34 @@ async function displayBets(searchQuery = '') {
 
         const nameCell = row.insertCell();
         nameCell.textContent = bet.name;
-        nameCell.contentEditable = true;
+        nameCell.setAttribute('data-id', doc.id);
 
         const amountCell = row.insertCell();
         amountCell.textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
-        amountCell.contentEditable = true;
 
         const oddsCell = row.insertCell();
         oddsCell.textContent = bet.odds;
-        oddsCell.contentEditable = true;
 
         const dateCell = row.insertCell();
         dateCell.textContent = bet.date;
-        dateCell.contentEditable = true;
 
         const outcomeCell = row.insertCell();
         outcomeCell.textContent = bet.outcome;
-        outcomeCell.contentEditable = true;
+        if (bet.outcome === 'Pending') {
+            const settleButton = document.createElement('button');
+            settleButton.textContent = 'Settle';
+            settleButton.addEventListener('click', () => settleBet(doc.id));
+            outcomeCell.appendChild(settleButton);
+        }
 
         const returnsCell = row.insertCell();
         returnsCell.textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
-        returnsCell.contentEditable = true;
 
         const actionsCell = row.insertCell();
-        if (bet.outcome === 'Pending') {
-            unsettledCount++;
-        }
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => enableEditMode(row));
+        actionsCell.appendChild(editButton);
 
         totalStaked += parseFloat(bet.amount);
         totalReturned += parseFloat(bet.returns);
@@ -98,6 +100,7 @@ async function displayBets(searchQuery = '') {
         if (bet.outcome === 'Won') wonCount++;
         if (bet.outcome === 'Placed') placedCount++;
         if (bet.outcome === 'Lost') lostCount++;
+        if (bet.outcome === 'Pending') unsettledCount++;
     });
 
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
@@ -110,31 +113,57 @@ async function displayBets(searchQuery = '') {
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
 
-async function saveAllChanges() {
-    const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
-    const rows = betsTable.rows;
-
-    for (let i = 0; i < rows.length; i++) {
-        const cells = rows[i].cells;
-        const betId = cells[0].getAttribute('data-id');
-        const updatedBet = {
-            name: cells[0].textContent,
-            amount: parseFloat(cells[1].textContent.replace('$', '')),
-            odds: cells[2].textContent,
-            date: cells[3].textContent,
-            outcome: cells[4].textContent,
-            returns: parseFloat(cells[5].textContent.replace('$', ''))
-        };
-
-        try {
-            const betRef = doc(db, "bets", betId);
-            await updateDoc(betRef, updatedBet);
-        } catch (error) {
-            console.error('Error updating bet: ', error);
-            alert('Error updating bet: ' + error.message);
-        }
+function enableEditMode(row) {
+    const cells = row.cells;
+    for (let i = 0; i < cells.length - 1; i++) {
+        cells[i].contentEditable = true;
     }
-    alert('All changes saved successfully!');
+    const saveButton = document.createElement('button');
+    saveButton.textContent = 'Save';
+    saveButton.addEventListener('click', () => saveChanges(row));
+    cells[cells.length - 1].appendChild(saveButton);
+}
+
+async function saveChanges(row) {
+    const cells = row.cells;
+    const betId = cells[0].getAttribute('data-id');
+    const updatedBet = {
+        name: cells[0].textContent,
+        amount: parseFloat(cells[1].textContent.replace('$', '')),
+        odds: cells[2].textContent,
+        date: cells[3].textContent,
+        outcome: cells[4].textContent,
+        returns: parseFloat(cells[5].textContent.replace('$', ''))
+    };
+
+    try {
+        const betRef = doc(db, "bets", betId);
+        await updateDoc(betRef, updatedBet);
+        alert('Bet updated successfully!');
+    } catch (error) {
+        console.error('Error updating bet: ', error);
+        alert('Error updating bet: ' + error.message);
+    }
+    displayBets();
+}
+
+async function settleBet(betId) {
+    const outcome = prompt("Enter outcome (Won, Placed, Lost):");
+    const returns = outcome === 'Won' || outcome === 'Placed' ? parseFloat(prompt("Enter returns amount:")) : 0;
+    
+    if (!outcome || (outcome !== 'Won' && outcome !== 'Placed' && outcome !== 'Lost')) {
+        alert('Invalid outcome');
+        return;
+    }
+
+    try {
+        const betRef = doc(db, "bets", betId);
+        await updateDoc(betRef, { outcome, returns });
+        alert('Bet settled successfully!');
+    } catch (error) {
+        console.error('Error settling bet: ', error);
+        alert('Error settling bet: ' + error.message);
+    }
     displayBets();
 }
 
@@ -192,14 +221,12 @@ async function generateProfitLossChart() {
     querySnapshot.forEach(doc => {
         const bet = doc.data();
         runningTotal += parseFloat(bet.returns) - parseFloat(bet.amount);
-        profitLossData.push({
-            x: new Date(bet.date),
-            y: parseFloat(runningTotal.toFixed(2))
-        });
+        profitLossData.push({ x: new Date(bet.date), y: runningTotal });
     });
 
     const profitLossChart = new ApexCharts(document.getElementById("profitLossChartContainer"), {
         series: [{
+            name: "Profit/Loss",
             data: profitLossData
         }],
         chart: {
@@ -209,14 +236,6 @@ async function generateProfitLossChart() {
         },
         xaxis: {
             type: "datetime"
-        },
-        yaxis: {
-            title: {
-                text: "Profit/Loss"
-            },
-            labels: {
-                formatter: (val) => `£${val.toFixed(2)}`
-            }
         }
     });
 
@@ -225,14 +244,10 @@ async function generateProfitLossChart() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
-    const editButton = document.getElementById('editButton');
-    const saveButton = document.getElementById('saveButton');
     const searchInput = document.getElementById('searchInput');
 
-    if (addBetButton) addBetButton.addEventListener('click', addBet);
-    if (editButton) editButton.addEventListener('click', () => { document.querySelectorAll('#betsTable td').forEach(cell => cell.contentEditable = true); });
-    if (saveButton) saveButton.addEventListener('click', saveAllChanges);
-    if (searchInput) searchInput.addEventListener('input', () => displayBets(searchInput.value));
+    addBetButton.addEventListener('click', addBet);
+    searchInput.addEventListener('input', () => displayBets(searchInput.value));
 
     await displayBets();
     await generateOutcomeChart();
