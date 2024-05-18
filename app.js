@@ -47,10 +47,6 @@ async function addBet() {
     }
 }
 
-// Add an input field for the search query
-<div>
-    <input type="text" id="searchInput" placeholder="Search bets">
-</div>
 
 // Attach an event listener to the search input field
 document.addEventListener('DOMContentLoaded', async () => {
