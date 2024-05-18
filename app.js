@@ -48,22 +48,6 @@ async function addBet() {
 }
 
 
-// Attach an event listener to the search input field
-document.addEventListener('DOMContentLoaded', async () => {
-    const addBetButton = document.getElementById('addBetButton');
-    const searchInput = document.getElementById('searchInput');
-    if (addBetButton) {
-        addBetButton.addEventListener('click', addBet);
-    }
-    if (searchInput) {
-        searchInput.addEventListener('input', displayBets);
-    }
-    // Display existing bets and generate charts
-    await displayBets();
-    await generateOutcomeChart();
-    await generateProfitLossChart();
-});
-
 // Modify the displayBets function to apply the search filter
 async function displayBets() {
     // Retrieve bets ordered by date
@@ -268,15 +252,24 @@ async function generateProfitLossChart() {
     profitLossChart.render();
 }
 
-
-// Event listener to load existing bets and set up the application
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
+    const searchInput = document.getElementById('searchInput');
     if (addBetButton) {
         addBetButton.addEventListener('click', addBet);
     }
+    if (searchInput) {
+        searchInput.addEventListener('input', displayBets);
+    }
+
+    // Display existing bets and generate charts only once
+    await setupApplication();
+});
+
+// Function to set up the application
+async function setupApplication() {
     // Display existing bets and generate charts
     await displayBets();
     await generateOutcomeChart();
     await generateProfitLossChart();
-});
+}
