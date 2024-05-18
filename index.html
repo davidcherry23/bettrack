@@ -14,7 +14,7 @@
         <p id="profitLoss">Profit/Loss: $0</p>
         <p id="wonPlacedLost">Won-Placed-Lost: 0-0-0</p>
         <p id="longestLosingStreak">Longest Losing Streak: 0</p>
-        <p id="unsettledBets">Unsettled bets: 0</p> <!-- Add the element for unsettled bets -->
+        <p id="unsettledBets">Unsettled bets: 0</p>
     </div>
 
     <div>
@@ -25,7 +25,12 @@
         <button id="addBetButton">Add Bet</button>
     </div>
 
-    <!-- Section to display bets in a table -->
+    <div>
+        <button id="editButton">Edit</button>
+        <button id="saveButton">Save</button>
+        <input type="text" id="searchInput" placeholder="Search Bets">
+    </div>
+
     <table id="betsTable">
         <thead>
             <tr>
@@ -34,14 +39,13 @@
                 <th>Odds</th>
                 <th>Date/Time</th>
                 <th>Outcome</th>
-                <th></th> <!-- Actions header removed -->
+                <th>Returns</th>
             </tr>
         </thead>
         <tbody>
         </tbody>
     </table>
 
-    <!-- Charts Section -->
     <div id="chartsContainer" style="display: flex;">
         <div id="outcomeChartContainer" style="flex: 1;"></div>
         <div id="profitLossChartContainer" style="flex: 1;"></div>
