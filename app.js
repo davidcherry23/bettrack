@@ -101,7 +101,13 @@ async function displayBets() {
             const row = betsTable.insertRow();
 
             // Fill table cells with bet information
-            row.insertCell().textContent = bet.name;
+            const nameCell = row.insertCell();
+            nameCell.textContent = bet.name;
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.onclick = () => enterEditMode(nameCell); // Enter edit mode when the button is clicked
+            nameCell.appendChild(editButton); // Append the edit button to the cell
+
             row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
             row.insertCell().textContent = bet.odds;
             row.insertCell().textContent = bet.date;
@@ -110,21 +116,24 @@ async function displayBets() {
 
             const actionsCell = row.insertCell();
             if (bet.outcome === 'Pending') {
-                const editButtons = [];
-
-                // Add edit buttons for editable fields
-                ['name', 'amount', 'odds', 'date'].forEach(field => {
-                    const editButton = document.createElement('button');
-                    editButton.textContent = 'Edit';
-                    editButton.onclick = () => enterEditMode(row.cells[field === 'date' ? 3 : row.cells.length - 2]); // Date cell is at index 3, returns cell is at index length - 2
-                    actionsCell.appendChild(editButton);
-                    editButtons.push(editButton);
+                const outcomeSelect = document.createElement('select');
+                ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
+                    const option = document.createElement('option');
+                    option.value = outcome;
+                    option.textContent = outcome;
+                    option.selected = outcome === bet.outcome;
+                    outcomeSelect.appendChild(option);
                 });
+                actionsCell.appendChild(outcomeSelect);
+
+                const returnInput = document.createElement('input');
+                returnInput.type = 'number';
+                returnInput.value = bet.returns;
+                actionsCell.appendChild(returnInput);
 
                 const saveButton = document.createElement('button');
                 saveButton.textContent = 'Save Changes';
-                saveButton.style.display = 'none'; // Initially hide the save button
-                saveButton.onclick = () => saveBetChanges(doc.id, editButtons, row.cells[row.cells.length - 2], row.cells[row.cells.length - 1], saveButton); // Pass edit buttons and returns cell
+                saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
                 actionsCell.appendChild(saveButton);
 
                 unsettledCount++;
@@ -149,40 +158,10 @@ async function displayBets() {
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
 
-
-// Function to save changes to a bet
-async function saveBetChanges(betId, editButtons, returnsCell, outcomeCell, saveButton) {
-    const betRef = doc(db, "bets", betId);
-    try {
-            // Update bet document in Firestore
-        const newValues = {};
-        editButtons.forEach((button, index) => {
-            const cell = button.parentElement.previousElementSibling; // Get the cell before the edit button
-            if (cell && cell.contentEditable === 'true') {
-                newValues[cell.dataset.field] = cell.textContent.trim(); // Store the new value in the field
-            }
-            cell.contentEditable = 'false'; // Disable editing for the cell
-            button.style.display = 'inline'; // Show the edit button again
-        });
-
-        // Update only the fields that were edited
-        await updateDoc(betRef, newValues);
-
-        // Optionally, disable the save button immediately to indicate the changes are saved
-        saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
-        alert('Bet updated successfully!');
-        displayBets(); // Refresh the list to reflect changes
-    } catch (error) {
-        console.error('Error updating bet: ', error);
-        alert('Error updating bet');
-    }
-}
-
 // Function to enter edit mode for a specific cell
 function enterEditMode(cell) {
     cell.contentEditable = 'true'; // Allow editing for the cell
     cell.focus(); // Set focus to the cell
-}
 
 // Function to calculate the longest losing streak based on date and time
 function calculateLongestLosingStreakByDateTime(bets) {
