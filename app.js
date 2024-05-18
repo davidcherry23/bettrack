@@ -47,6 +47,28 @@ async function addBet() {
     }
 }
 
+// Add an input field for the search query
+<div>
+    <input type="text" id="searchInput" placeholder="Search bets">
+</div>
+
+// Attach an event listener to the search input field
+document.addEventListener('DOMContentLoaded', async () => {
+    const addBetButton = document.getElementById('addBetButton');
+    const searchInput = document.getElementById('searchInput');
+    if (addBetButton) {
+        addBetButton.addEventListener('click', addBet);
+    }
+    if (searchInput) {
+        searchInput.addEventListener('input', displayBets);
+    }
+    // Display existing bets and generate charts
+    await displayBets();
+    await generateOutcomeChart();
+    await generateProfitLossChart();
+});
+
+// Modify the displayBets function to apply the search filter
 async function displayBets() {
     // Retrieve bets ordered by date
     const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
@@ -56,8 +78,9 @@ async function displayBets() {
     const totalReturnedElement = document.getElementById('totalReturned');
     const profitLossElement = document.getElementById('profitLoss');
     const longestLosingStreakElement = document.getElementById('longestLosingStreak');
-    const wonPlacedLostElement = document.getElementById('wonPlacedLost'); // New element for Won-Placed-Lost
-    const unsettledBetsElement = document.getElementById('unsettledBets'); // New element for Unsettled bets
+    const wonPlacedLostElement = document.getElementById('wonPlacedLost');
+    const unsettledBetsElement = document.getElementById('unsettledBets');
+    const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
 
     // Check if any required elements are null
     if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement || !unsettledBetsElement) {
@@ -72,71 +95,67 @@ async function displayBets() {
     let wonCount = 0;
     let placedCount = 0;
     let lostCount = 0;
-    let unsettledCount = 0; // Initialize count for unsettled bets
+    let unsettledCount = 0;
 
-    // Iterate over each bet document
+    // Iterate over each bet document and apply search filter
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
-        bets.push(bet); // Store bet for later use
-        const row = betsTable.insertRow();
+        if (searchInput.length === 0 || bet.name.toLowerCase().includes(searchInput)) {
+            bets.push(bet); // Store bet for later use
+            const row = betsTable.insertRow();
 
-        // Fill table cells with bet information
-        row.insertCell().textContent = bet.name;
-        row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
-        row.insertCell().textContent = bet.odds;
-        row.insertCell().textContent = bet.date; // Display the date/time
-        row.insertCell().textContent = bet.outcome;
-        row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
+            // Fill table cells with bet information
+            row.insertCell().textContent = bet.name;
+            row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+            row.insertCell().textContent = bet.odds;
+            row.insertCell().textContent = bet.date;
+            row.insertCell().textContent = bet.outcome;
+            row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
 
-        const actionsCell = row.insertCell();
-        if (bet.outcome === 'Pending') {
-            // Allow editing for pending bets
-            const outcomeSelect = document.createElement('select');
-            ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
-                const option = document.createElement('option');
-                option.value = outcome;
-                option.textContent = outcome;
-                option.selected = outcome === bet.outcome;
-                outcomeSelect.appendChild(option);
-            });
-            actionsCell.appendChild(outcomeSelect);
+            const actionsCell = row.insertCell();
+            if (bet.outcome === 'Pending') {
+                const outcomeSelect = document.createElement('select');
+                ['Won', 'Placed', 'Lost', 'Pending'].forEach(outcome => {
+                    const option = document.createElement('option');
+                    option.value = outcome;
+                    option.textContent = outcome;
+                    option.selected = outcome === bet.outcome;
+                    outcomeSelect.appendChild(option);
+                });
+                actionsCell.appendChild(outcomeSelect);
 
-            const returnInput = document.createElement('input');
-            returnInput.type = 'number';
-            returnInput.value = bet.returns;
-            actionsCell.appendChild(returnInput);
+                const returnInput = document.createElement('input');
+                returnInput.type = 'number';
+                returnInput.value = bet.returns;
+                actionsCell.appendChild(returnInput);
 
-            const saveButton = document.createElement('button');
-            saveButton.textContent = 'Save Changes';
-            // Attach event listener to save changes
-            saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
-            actionsCell.appendChild(saveButton);
+                const saveButton = document.createElement('button');
+                saveButton.textContent = 'Save Changes';
+                saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
+                actionsCell.appendChild(saveButton);
 
-            // Increment unsettled count for unsettled bets
-            unsettledCount++;
+                unsettledCount++;
+            }
+
+            totalStaked += parseFloat(bet.amount);
+            totalReturned += parseFloat(bet.returns);
+
+            if (bet.outcome === 'Won') wonCount++;
+            if (bet.outcome === 'Placed') placedCount++;
+            if (bet.outcome === 'Lost') lostCount++;
         }
-
-        // Update totals
-        totalStaked += parseFloat(bet.amount);
-        totalReturned += parseFloat(bet.returns);
-
-        // Update counts for Won, Placed, and Lost
-        if (bet.outcome === 'Won') wonCount++;
-        if (bet.outcome === 'Placed') placedCount++;
-        if (bet.outcome === 'Lost') lostCount++;
     });
 
-    // Calculate the longest losing streak
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
 
-    // Update the summary with calculated values
     totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
     wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
-    unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`; // Update unsettled bets count
+    unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
+
 
 // Function to save changes to a bet
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
