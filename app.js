@@ -314,6 +314,18 @@ async function generateProfitLossChart() {
             labels: {
                 formatter: (val) => `$${val.toFixed(2)}` // Ensure y-axis labels are to 2 decimal places
             }
+        },
+        tooltip: {
+            enabled: true,
+            x: {
+                show: true,
+                format: 'dd MMM yyyy' // Customize the date format
+            },
+            y: {
+                formatter: function(value) {
+                    return "$" + value.toFixed(2); // Ensure y-axis tooltip shows currency
+                }
+            }
         }
     });
 
