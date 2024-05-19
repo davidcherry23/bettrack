@@ -70,3 +70,12 @@ ul {
     list-style-type: none;
     padding: 0;
 }
+
+/* Customize ApexCharts tooltip */
+.apexcharts-tooltip {
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+    color: #fff; /* White text color */
+    border-radius: 5px; /* Rounded corners */
+    padding: 8px 12px; /* Padding around the content */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Shadow for depth */
+}
