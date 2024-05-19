@@ -1,105 +1,77 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
-    background-color: #333; /* Dark background color */
-    color: #f4f4f9; /* Light text color */
+    background-color: #f4f4f9;
+    color: #333;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="datetime-local"],
-button {
+input[type="text"], input[type="number"], input[type="datetime-local"] {
     padding: 10px;
     margin: 5px;
-    border: 2px solid #555; /* Darker border color */
+    border: 2px solid #ccc;
     border-radius: 5px;
-    width: 200px;
-    background-color: #555; /* Dark input and button background */
-    color: #f4f4f9; /* Light text color */
+    width: 200px; /* Consistent input width */
+}
+
+button {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #4CAF50; /* A fresh, vibrant green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #777; /* Darker hover color for buttons */
+    background-color: #45a049;
 }
 
 table {
     width: 100%;
     margin-top: 20px;
     border-collapse: collapse;
-    border: 2px solid #555; /* Darker border color */
 }
 
-th,
-td {
+th, td {
     text-align: left;
     padding: 8px;
-    border-bottom: 1px solid #444; /* Darker border color for table rows */
-    color: #f4f4f9; /* Light text color */
+    border-bottom: 1px solid #ddd;
 }
 
 th {
-    background-color: #666; /* Dark table header background */
+    background-color: #4CAF50;
+    color: white;
 }
 
 /* Add alternating background colors to table rows */
 tr:nth-child(even) {
-    background-color: #444; /* Darker table row background */
+    background-color: #f2f2f2; /* Light gray background color */
 }
 
 #exportButton {
     font-size: 12px;
-    padding: 5px 10px;
+    padding: 5px 10px; /* Adjust padding as needed */
 }
+
+
 
 #summaryChart {
-    background-color: #222; /* Dark summary chart background */
+    background-color: white;
     padding: 15px;
     margin-top: 20px;
-    margin-right: 20px; /* Space from right */
-    margin-bottom: 20px; /* Space from bottom */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    color: #f4f4f9; /* Light text color */
 }
 
+
+
 h3 {
-    color: #f4f4f9; /* Light text color */
+    color: #333;
 }
 
 ul {
     list-style-type: none;
     padding: 0;
-}
-
-/* Customize ApexCharts tooltip */
-.apexcharts-tooltip {
-    background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent black background */
-    color: #f4f4f9; /* Light text color */
-    border-radius: 5px; /* Rounded corners */
-    padding: 8px 12px; /* Padding around the content */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Shadow for depth */
-}
-
-
-#profitLossChartContainer .apexcharts-tooltip,
-#outcomeChartContainer .apexcharts-tooltip {
-    color: #000; /* Black text color for the tooltip */
-}
-
-/* Adjust text color of the key in the line chart */
-#profitLossChartContainer .apexcharts-xaxis-label,
-#profitLossChartContainer .apexcharts-yaxis-label {
-    fill: #fff; /* White text color */
-}
-
-/* Adjust text color of the labels in the donut chart */
-#outcomeChartContainer text.tspan {
-    fill: #fff !important; /* White text color */
-}
-
-
-
-
-
-
 }
