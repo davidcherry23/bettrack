@@ -320,6 +320,25 @@ async function generateProfitLossChart() {
     profitLossChart.render();
 }
 
+
+// JavaScript to dynamically adjust the position of the summary chart on mobile devices
+function adjustSummaryPosition() {
+  const summaryChart = document.getElementById('summaryChart');
+  if (window.innerWidth <= 600) { // Adjust the width threshold as needed
+    summaryChart.style.position = 'fixed';
+    summaryChart.style.bottom = '20px';
+    summaryChart.style.right = '20px';
+  } else {
+    summaryChart.style.position = 'static'; // Or whatever the original position was
+  }
+}
+
+// Call the function when the page is loaded and when the window is resized
+document.addEventListener('DOMContentLoaded', adjustSummaryPosition);
+window.addEventListener('resize', adjustSummaryPosition);
+
+
+
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
     const searchInput = document.getElementById('searchInput');
