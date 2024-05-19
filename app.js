@@ -103,23 +103,6 @@ async function displayBets() {
             row.insertCell().textContent = bet.outcome;
             row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
 
-            // Apply styling based on outcome
-            switch (bet.outcome) {
-                case 'Won':
-                    row.classList.add('won-bet');
-                    break;
-                case 'Placed':
-                    row.classList.add('placed-bet');
-                    break;
-                case 'Lost':
-                    row.classList.add('lost-bet');
-                    break;
-                case 'Pending':
-                    unsettledCount++;
-                    break;
-            }
-
-            
             const actionsCell = row.insertCell();
             if (bet.outcome === 'Pending') {
                 const outcomeSelect = document.createElement('select');
