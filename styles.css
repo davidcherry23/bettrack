@@ -80,4 +80,11 @@ ul {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Shadow for depth */
 }
 
+
+#profitLossChartContainer .apexcharts-tooltip,
+#outcomeChartContainer .apexcharts-tooltip {
+    color: #000; /* Black text color for the tooltip */
+}
+
+
 }
