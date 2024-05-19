@@ -1,3 +1,4 @@
+/* General styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
@@ -5,18 +6,22 @@ body {
     color: #333;
 }
 
-input[type="text"], input[type="number"], input[type="datetime-local"] {
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+button {
     padding: 10px;
     margin: 5px;
     border: 2px solid #ccc;
     border-radius: 5px;
-    width: 200px; /* Consistent input width */
+    width: 200px;
+    background-color: #fff; /* White background */
+    color: #333;
 }
 
 button {
-    padding: 10px 20px;
     cursor: pointer;
-    background-color: #4CAF50; /* A fresh, vibrant green */
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 5px;
@@ -28,6 +33,7 @@ button:hover {
     background-color: #45a049;
 }
 
+/* Table styles */
 table {
     width: 100%;
     margin-top: 20px;
@@ -47,16 +53,16 @@ th {
 
 /* Add alternating background colors to table rows */
 tr:nth-child(even) {
-    background-color: #f2f2f2; /* Light gray background color */
+    background-color: #f2f2f2;
 }
 
+/* Export button */
 #exportButton {
     font-size: 12px;
-    padding: 5px 10px; /* Adjust padding as needed */
+    padding: 5px 10px;
 }
 
-
-
+/* Summary chart */
 #summaryChart {
     background-color: white;
     padding: 15px;
@@ -65,8 +71,7 @@ tr:nth-child(even) {
     border-radius: 5px;
 }
 
-
-
+/* Headings */
 h3 {
     color: #333;
 }
