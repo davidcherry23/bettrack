@@ -143,18 +143,15 @@ async function displayBets() {
     totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
 
     const profitLoss = totalReturned - totalStaked;
-    profitLossElement.textContent = `Profit/Loss: $${profitLoss.toFixed(2)}`;
-    profitLossElement.style.color = profitLoss >= 0 ? 'green' : 'red'; // Set color based on value
+    profitLossElement.innerHTML = `Profit/Loss: <span style="color: ${profitLoss >= 0 ? 'green' : 'red'}">$${profitLoss.toFixed(2)}</span>`;
 
     const roi = totalStaked !== 0 ? ((totalReturned - totalStaked) / totalStaked) * 100 : 0;
-    roiElement.textContent = `ROI: ${roi.toFixed(2)}%`;
-    roiElement.style.color = roi >= 0 ? 'green' : 'red'; // Set color based on value
+    roiElement.innerHTML = `ROI: <span style="color: ${roi >= 0 ? 'green' : 'red'}">${roi.toFixed(2)}%</span>`;
 
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
 
-    // Update Won-Placed-Lost with specific colors for Won and Lost
-    wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green;">${wonCount}</span>-<span>${placedCount}</span>-<span style="color: red;">${lostCount}</span>`;
-    
+    // Update Won-Placed-Lost with specific colors
+    wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green">${wonCount}</span>-<span style="color: blue">${placedCount}</span>-<span style="color: red">${lostCount}</span>`;
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
 
