@@ -141,10 +141,14 @@ async function displayBets() {
 
     totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
-    profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+
+    const profitLoss = totalReturned - totalStaked;
+    profitLossElement.textContent = `Profit/Loss: $${profitLoss.toFixed(2)}`;
+    profitLossElement.style.color = profitLoss >= 0 ? 'green' : 'red'; // Set color based on value
 
     const roi = totalStaked !== 0 ? ((totalReturned - totalStaked) / totalStaked) * 100 : 0;
-    roiElement.textContent = `ROI: ${roi.toFixed(2)}%`; // Display ROI
+    roiElement.textContent = `ROI: ${roi.toFixed(2)}%`;
+    roiElement.style.color = roi >= 0 ? 'green' : 'red'; // Set color based on value
 
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
     wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
