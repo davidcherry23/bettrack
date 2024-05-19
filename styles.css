@@ -93,9 +93,10 @@ ul {
 }
 
 /* Adjust text color of the labels in the donut chart */
-#outcomeChartContainer text.labels {
+#outcomeChartContainer text.tspan {
     fill: #fff !important; /* White text color */
 }
+
 
 
 
