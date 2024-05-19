@@ -151,7 +151,10 @@ async function displayBets() {
     roiElement.style.color = roi >= 0 ? 'green' : 'red'; // Set color based on value
 
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
-    wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
+
+    // Update Won-Placed-Lost with specific colors for Won and Lost
+    wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green;">${wonCount}</span>-<span>${placedCount}</span>-<span style="color: red;">${lostCount}</span>`;
+    
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
 
