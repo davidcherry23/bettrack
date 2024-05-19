@@ -50,6 +50,13 @@ tr:nth-child(even) {
     background-color: #f2f2f2; /* Light gray background color */
 }
 
+#exportButton {
+    font-size: 12px;
+    padding: 5px 10px; /* Adjust padding as needed */
+}
+
+
+
 #summaryChart {
     background-color: white;
     padding: 15px;
