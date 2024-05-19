@@ -93,9 +93,10 @@ ul {
 }
 
 /* Adjust text color of the key in the donut chart */
-#outcomeChartContainer .apexcharts-legend-text {
+#outcomeChartContainer text.apexcharts-legend-text {
     fill: #fff !important; /* White text color */
 }
+
 
 
 
