@@ -65,23 +65,6 @@ tr:nth-child(even) {
     border-radius: 5px;
 }
 
-/* CSS for mobile layout */
-@media screen and (max-width: 600px) {
-  /* Adjust positioning of side summary */
-  #summaryChart {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 200px; /* Adjust width as needed */
-    background-color: white; /* Ensure it's visible against the background */
-    border: 1px solid #ccc; /* Add a border for visibility */
-    padding: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-    z-index: 999; /* Ensure it's above other content */
-  }
-}
-
-
 
 
 h3 {
