@@ -67,13 +67,14 @@ async function displayBets() {
     const totalStakedElement = document.getElementById('totalStaked');
     const totalReturnedElement = document.getElementById('totalReturned');
     const profitLossElement = document.getElementById('profitLoss');
+    const roiElement = document.getElementById('roi'); // Get the ROI element
     const longestLosingStreakElement = document.getElementById('longestLosingStreak');
     const wonPlacedLostElement = document.getElementById('wonPlacedLost');
     const unsettledBetsElement = document.getElementById('unsettledBets');
     const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
 
     // Check if any required elements are null
-    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !longestLosingStreakElement || !wonPlacedLostElement || !unsettledBetsElement) {
+    if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !roiElement || !longestLosingStreakElement || !wonPlacedLostElement || !unsettledBetsElement) {
         console.error("One or more elements not found.");
         return;
     }
@@ -141,6 +142,10 @@ async function displayBets() {
     totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
     totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
     profitLossElement.textContent = `Profit/Loss: $${(totalReturned - totalStaked).toFixed(2)}`;
+
+    const roi = totalStaked !== 0 ? ((totalReturned - totalStaked) / totalStaked) * 100 : 0;
+    roiElement.textContent = `ROI: ${roi.toFixed(2)}%`; // Display ROI
+
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
     wonPlacedLostElement.textContent = `Won-Placed-Lost: ${wonCount}-${placedCount}-${lostCount}`;
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
