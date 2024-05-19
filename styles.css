@@ -86,5 +86,12 @@ ul {
     color: #000; /* Black text color for the tooltip */
 }
 
+/* Adjust text color of the key in the donut chart */
+#outcomeChartContainer .apexcharts-legend-text,
+#profitLossChartContainer .apexcharts-xaxis-label,
+#profitLossChartContainer .apexcharts-yaxis-label {
+    fill: #fff; /* White text color */
+}
+
 
 }
