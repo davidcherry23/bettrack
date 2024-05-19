@@ -87,7 +87,6 @@ ul {
 }
 
 /* Adjust text color of the key in the donut chart */
-#outcomeChartContainer .apexcharts-legend-text,
 #profitLossChartContainer .apexcharts-xaxis-label,
 #profitLossChartContainer .apexcharts-yaxis-label {
     fill: #fff; /* White text color */
@@ -95,8 +94,9 @@ ul {
 
 /* Adjust text color of the key in the donut chart */
 #outcomeChartContainer .apexcharts-legend-text {
-    fill: #fff; /* White text color */
+    fill: #fff !important; /* White text color */
 }
+
 
 
 }
