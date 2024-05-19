@@ -1,31 +1,25 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: #333; /* Dark background color */
+    color: #f4f4f9; /* Light text color */
 }
 
-input[type="text"], input[type="number"], input[type="datetime-local"] {
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+button {
     padding: 10px;
     margin: 5px;
     border: 2px solid #ccc;
     border-radius: 5px;
-    width: 200px; /* Consistent input width */
-}
-
-button {
-    padding: 10px 20px;
-    cursor: pointer;
-    background-color: #4CAF50; /* A fresh, vibrant green */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    width: 200px;
+    background-color: #555; /* Dark input and button background */
+    color: #f4f4f9; /* Light text color */
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #777; /* Darker hover color for buttons */
 }
 
 table {
@@ -34,41 +28,41 @@ table {
     border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
     text-align: left;
     padding: 8px;
     border-bottom: 1px solid #ddd;
+    color: #f4f4f9; /* Light text color */
 }
 
 th {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #666; /* Dark table header background */
 }
 
 /* Add alternating background colors to table rows */
 tr:nth-child(even) {
-    background-color: #f2f2f2; /* Light gray background color */
+    background-color: #444; /* Darker table row background */
 }
 
 #exportButton {
     font-size: 12px;
-    padding: 5px 10px; /* Adjust padding as needed */
+    padding: 5px 10px;
 }
-
-
 
 #summaryChart {
-    background-color: white;
+    background-color: #222; /* Dark summary chart background */
     padding: 15px;
     margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-right: 20px; /* Space from right */
+    margin-bottom: 20px; /* Space from bottom */
     border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #f4f4f9; /* Light text color */
 }
 
-
-
 h3 {
-    color: #333;
+    color: #f4f4f9; /* Light text color */
 }
 
 ul {
