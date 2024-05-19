@@ -47,6 +47,16 @@ async function addBet() {
     }
 }
 
+// Function to format the date and time
+function formatDateTime(dateTime) {
+    const date = new Date(dateTime);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
+}
 
 // Modify the displayBets function to apply the search filter
 async function displayBets() {
@@ -88,7 +98,7 @@ async function displayBets() {
             row.insertCell().textContent = bet.name;
             row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
             row.insertCell().textContent = bet.odds;
-            row.insertCell().textContent = bet.date;
+            row.insertCell().textContent = formatDateTime(bet.date); // Use formatted date
             row.insertCell().textContent = bet.outcome;
             row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
 
@@ -136,7 +146,6 @@ async function displayBets() {
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
 
-
 // Function to save changes to a bet
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
     const betRef = doc(db, "bets", betId);
@@ -154,8 +163,7 @@ async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInpu
         returnInput.disabled = true;
         saveButton.style.display = 'none'; // Hide the save button as it's no longer needed
     } catch (error) {
-        console.error('Error updating bet: ', error
-);
+        console.error('Error updating bet: ', error);
         alert('Error updating bet');
     }
 }
@@ -252,6 +260,14 @@ async function generateProfitLossChart() {
     profitLossChart.render();
 }
 
+// Function to set up the application
+async function setupApplication() {
+    // Display existing bets and generate charts
+    await displayBets();
+    await generateOutcomeChart();
+    await generateProfitLossChart();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
     const searchInput = document.getElementById('searchInput');
@@ -265,11 +281,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Display existing bets and generate charts only once
     await setupApplication();
 });
-
-// Function to set up the application
-async function setupApplication() {
-    // Display existing bets and generate charts
-    await displayBets();
-    await generateOutcomeChart();
-    await generateProfitLossChart();
-}
