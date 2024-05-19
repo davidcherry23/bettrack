@@ -58,7 +58,7 @@ function formatDateTime(dateTime) {
     return `${day}-${month}-${year} ${hours}:${minutes}`;
 }
 
-// Modify the displayBets function to apply the search filter
+// Modify the displayBets function to display amounts in pounds (£)
 async function displayBets() {
     // Retrieve bets ordered by date
     const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
@@ -97,7 +97,7 @@ async function displayBets() {
 
             // Fill table cells with bet information
             row.insertCell().textContent = bet.name;
-            row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
+            row.insertCell().textContent = `£${parseFloat(bet.amount).toFixed(2)}`; // Display amount in pounds (£)
             row.insertCell().textContent = bet.odds;
             row.insertCell().textContent = formatDateTime(bet.date); // Use formatted date
 
@@ -118,7 +118,7 @@ async function displayBets() {
                     // For 'Pending', no specific color needed
             }
 
-            row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
+            row.insertCell().textContent = `£${parseFloat(bet.returns).toFixed(2)}`; // Display returns in pounds (£)
 
             const actionsCell = row.insertCell();
             if (bet.outcome === 'Pending') {
@@ -156,16 +156,18 @@ async function displayBets() {
 
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
 
-    totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
-    totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
+    totalStakedElement.textContent = `Total Staked: £${totalStaked.toFixed(2)}`; // Display total staked in pounds (£)
+    totalReturnedElement.textContent = `Total Returned: £${totalReturned.toFixed(2)}`; // Display total returned in pounds (£)
 
     const profitLoss = totalReturned - totalStaked;
-    profitLossElement.innerHTML = `Profit/Loss: <span style="color: ${profitLoss >= 0 ? 'green' : 'red'}">$${profitLoss.toFixed(2)}</span>`;
+    profitLossElement.innerHTML = `Profit/Loss: <span style="color: ${profitLoss >= 0 ? 'green' : 'red'}">£${profitLoss.toFixed(2)}</span>`; // Display profit/loss in pounds (£)
 
     const roi = totalStaked !== 0 ? ((totalReturned - totalStaked) / totalStaked) * 100 : 0;
     roiElement.innerHTML = `ROI: <span style="color: ${roi >= 0 ? 'green' : 'red'}">${roi.toFixed(2)}%</span>`;
 
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
+
+    //
 
     // Update Won-Placed-Lost with specific colors
     wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green">${wonCount}</span>-<span style="color: orange">${placedCount}</span>-<span style="color: red">${lostCount}</span>`;
