@@ -100,7 +100,24 @@ async function displayBets() {
             row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
             row.insertCell().textContent = bet.odds;
             row.insertCell().textContent = formatDateTime(bet.date); // Use formatted date
-            row.insertCell().textContent = bet.outcome;
+
+            // Fill outcome cell with bet outcome and set color based on outcome
+            const outcomeCell = row.insertCell();
+            outcomeCell.textContent = bet.outcome;
+            switch (bet.outcome) {
+                case 'Won':
+                    outcomeCell.style.color = 'green';
+                    break;
+                case 'Lost':
+                    outcomeCell.style.color = 'red';
+                    break;
+                case 'Placed':
+                    outcomeCell.style.color = 'orange';
+                    break;
+                default:
+                    // For 'Pending', no specific color needed
+            }
+
             row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
 
             const actionsCell = row.insertCell();
@@ -151,9 +168,10 @@ async function displayBets() {
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
 
     // Update Won-Placed-Lost with specific colors
-    wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green">${wonCount}</span>-<span style="color: blue">${placedCount}</span>-<span style="color: red">${lostCount}</span>`;
+    wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green">${wonCount}</span>-<span style="color: orange">${placedCount}</span>-<span style="color: red">${lostCount}</span>`;
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
+
 
 // Function to save changes to a bet
 async function saveBetChanges(betId, outcome, returns, outcomeSelect, returnInput, saveButton) {
