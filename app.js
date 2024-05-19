@@ -55,7 +55,7 @@ function formatDateTime(dateTime) {
     const year = date.getFullYear();
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `£{day}-£{month}-£{year} £{hours}:£{minutes}`;
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
 }
 
 // Modify the displayBets function to apply the search filter
@@ -97,7 +97,7 @@ async function displayBets() {
 
             // Fill table cells with bet information
             row.insertCell().textContent = bet.name;
-            row.insertCell().textContent = `££{parseFloat(bet.amount).toFixed(2)}`;
+            row.insertCell().textContent = `$${parseFloat(bet.amount).toFixed(2)}`;
             row.insertCell().textContent = bet.odds;
             row.insertCell().textContent = formatDateTime(bet.date); // Use formatted date
 
@@ -118,7 +118,7 @@ async function displayBets() {
                     // For 'Pending', no specific color needed
             }
 
-            row.insertCell().textContent = `££{parseFloat(bet.returns).toFixed(2)}`;
+            row.insertCell().textContent = `$${parseFloat(bet.returns).toFixed(2)}`;
 
             const actionsCell = row.insertCell();
             if (bet.outcome === 'Pending') {
@@ -156,20 +156,20 @@ async function displayBets() {
 
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
 
-    totalStakedElement.textContent = `Total Staked: ££{totalStaked.toFixed(2)}`;
-    totalReturnedElement.textContent = `Total Returned: ££{totalReturned.toFixed(2)}`;
+    totalStakedElement.textContent = `Total Staked: $${totalStaked.toFixed(2)}`;
+    totalReturnedElement.textContent = `Total Returned: $${totalReturned.toFixed(2)}`;
 
     const profitLoss = totalReturned - totalStaked;
-    profitLossElement.innerHTML = `Profit/Loss: <span style="color: £{profitLoss >= 0 ? 'green' : 'red'}">££{profitLoss.toFixed(2)}</span>`;
+    profitLossElement.innerHTML = `Profit/Loss: <span style="color: ${profitLoss >= 0 ? 'green' : 'red'}">$${profitLoss.toFixed(2)}</span>`;
 
     const roi = totalStaked !== 0 ? ((totalReturned - totalStaked) / totalStaked) * 100 : 0;
-    roiElement.innerHTML = `ROI: <span style="color: £{roi >= 0 ? 'green' : 'red'}">£{roi.toFixed(2)}%</span>`;
+    roiElement.innerHTML = `ROI: <span style="color: ${roi >= 0 ? 'green' : 'red'}">${roi.toFixed(2)}%</span>`;
 
-    longestLosingStreakElement.textContent = `Longest Losing Streak: £{longestLosingStreak}`;
+    longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
 
     // Update Won-Placed-Lost with specific colors
-    wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green">£{wonCount}</span>-<span style="color: orange">£{placedCount}</span>-<span style="color: red">£{lostCount}</span>`;
-    unsettledBetsElement.textContent = `Unsettled bets: £{unsettledCount}`;
+    wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green">${wonCount}</span>-<span style="color: orange">${placedCount}</span>-<span style="color: red">${lostCount}</span>`;
+    unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
 
 
@@ -310,7 +310,7 @@ async function generateProfitLossChart() {
                 text: "Profit/Loss"
             },
             labels: {
-                formatter: (val) => `££{val.toFixed(2)}` // Ensure y-axis labels are to 2 decimal places
+                formatter: (val) => `$${val.toFixed(2)}` // Ensure y-axis labels are to 2 decimal places
             }
         }
     });
