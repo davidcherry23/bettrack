@@ -45,6 +45,21 @@ th {
     color: white;
 }
 
+/* Define colors for different outcomes */
+.won-bet {
+    background-color: lightgreen;
+}
+
+.placed-bet {
+    background-color: lightsalmon;
+}
+
+.lost-bet {
+    background-color: lightcoral;
+}
+
+
+
 /* Add alternating background colors to table rows */
 tr:nth-child(even) {
     background-color: #f2f2f2; /* Light gray background color */
