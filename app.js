@@ -317,20 +317,17 @@ async function generateProfitLossChart() {
         },
         tooltip: {
             enabled: true,
-            x: {
-                show: true,
-                format: 'dd MMM yyyy' // Customize the date format
-            },
-            y: {
-                formatter: function(value) {
-                    return "$" + value.toFixed(2); // Ensure y-axis tooltip shows currency
-                }
+            custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                const date = new Date(w.config.series[seriesIndex].data[dataPointIndex].x);
+                const value = w.config.series[seriesIndex].data[dataPointIndex].y.toFixed(2);
+                return `<div>Date: ${date.toLocaleDateString()}</div><div>Profit/Loss: $${value}</div>`;
             }
         }
     });
 
     profitLossChart.render();
 }
+
 
 
 
