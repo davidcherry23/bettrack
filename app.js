@@ -213,6 +213,37 @@ function calculateLongestLosingStreakByDateTime(bets) {
     return longestStreak;
 }
 
+function exportTableData() {
+    const betsTable = document.getElementById('betsTable');
+    const rows = betsTable.getElementsByTagName('tr');
+    let csvContent = "data:text/csv;charset=utf-8,";
+
+    // Loop through table rows
+    for (const row of rows) {
+        const cells = row.getElementsByTagName('td');
+        const rowData = [];
+
+        // Loop through table cells
+        for (const cell of cells) {
+            rowData.push(cell.textContent.trim());
+        }
+
+        // Create CSV row
+        const csvRow = rowData.join(',');
+        csvContent += csvRow + "\r\n";
+    }
+
+    // Create download link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "table_data.csv");
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+}
+
+
+
 // Function to generate outcome chart
 async function generateOutcomeChart() {
     const betsQuery = query(collection(db, "bets"));
@@ -290,16 +321,21 @@ async function generateProfitLossChart() {
 document.addEventListener('DOMContentLoaded', async () => {
     const addBetButton = document.getElementById('addBetButton');
     const searchInput = document.getElementById('searchInput');
+    const exportButton = document.getElementById('exportButton');
     if (addBetButton) {
         addBetButton.addEventListener('click', addBet);
     }
     if (searchInput) {
         searchInput.addEventListener('input', displayBets);
     }
+    if (exportButton) {
+        exportButton.addEventListener('click', exportTableData);
+    }
 
     // Display existing bets and generate charts only once
     await setupApplication();
 });
+
 
 // Function to set up the application
 async function setupApplication() {
