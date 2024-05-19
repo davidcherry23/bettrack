@@ -312,7 +312,7 @@ async function generateProfitLossChart() {
                 text: "Profit/Loss"
             },
             labels: {
-                formatter: (val) => `$${val.toFixed(2)}` // Ensure y-axis labels are to 2 decimal places
+                formatter: (val) => `£${val.toFixed(2)}` // Display £ symbol before the value
             }
         },
         tooltip: {
@@ -320,7 +320,7 @@ async function generateProfitLossChart() {
             custom: function({ series, seriesIndex, dataPointIndex, w }) {
                 const date = new Date(w.config.series[seriesIndex].data[dataPointIndex].x);
                 const value = w.config.series[seriesIndex].data[dataPointIndex].y.toFixed(2);
-                return `<div>Date: ${date.toLocaleDateString()}</div><div>Profit/Loss: $${value}</div>`;
+                return `<div>Date: ${date.toLocaleDateString()}</div><div>Profit/Loss: £${value}</div>`;
             }
         }
     });
