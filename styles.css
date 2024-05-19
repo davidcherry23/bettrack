@@ -65,6 +65,23 @@ tr:nth-child(even) {
     border-radius: 5px;
 }
 
+/* CSS for mobile layout */
+@media screen and (max-width: 600px) {
+  /* Adjust positioning of side summary */
+  #summaryChart {
+    position: static; /* or position: relative; */
+    margin-top: 20px; /* Adjust as needed */
+    margin-right: 0;
+  }
+
+  /* Adjust width of summary chart */
+  #summaryChart {
+    width: 100%; /* Occupy full width on smaller screens */
+  }
+}
+
+
+
 h3 {
     color: #333;
 }
