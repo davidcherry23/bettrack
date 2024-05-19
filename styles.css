@@ -1,8 +1,8 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
-    background-color: #f4f4f9; /* Light background color */
-    color: #333; /* Dark text color */
+    background-color: #333; /* Dark background color */
+    color: #f4f4f9; /* Light text color */
 }
 
 input[type="text"],
@@ -11,39 +11,39 @@ input[type="datetime-local"],
 button {
     padding: 10px;
     margin: 5px;
-    border: 2px solid #ccc; /* Light border color */
+    border: 2px solid #555; /* Darker border color */
     border-radius: 5px;
     width: 200px;
-    background-color: #fff; /* White background for input fields and buttons */
-    color: #333; /* Dark text color */
+    background-color: #555; /* Dark input and button background */
+    color: #f4f4f9; /* Light text color */
 }
 
 button:hover {
-    background-color: #e0e0e0; /* Light hover color for buttons */
+    background-color: #777; /* Darker hover color for buttons */
 }
 
 table {
     width: 100%;
     margin-top: 20px;
     border-collapse: collapse;
-    border: 2px solid #ccc; /* Light border color */
+    border: 2px solid #555; /* Darker border color */
 }
 
 th,
 td {
     text-align: left;
     padding: 8px;
-    border-bottom: 1px solid #ddd; /* Light border color for table rows */
-    color: #333; /* Dark text color */
+    border-bottom: 1px solid #444; /* Darker border color for table rows */
+    color: #f4f4f9; /* Light text color */
 }
 
 th {
-    background-color: #f2f2f2; /* Light table header background */
+    background-color: #666; /* Dark table header background */
 }
 
 /* Add alternating background colors to table rows */
 tr:nth-child(even) {
-    background-color: #f9f9f9; /* Lighter alternate table row background */
+    background-color: #444; /* Darker table row background */
 }
 
 #exportButton {
@@ -52,18 +52,18 @@ tr:nth-child(even) {
 }
 
 #summaryChart {
-    background-color: #fff; /* White summary chart background */
+    background-color: #222; /* Dark summary chart background */
     padding: 15px;
     margin-top: 20px;
     margin-right: 20px; /* Space from right */
     margin-bottom: 20px; /* Space from bottom */
     border-radius: 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    color: #333; /* Dark text color */
+    color: #f4f4f9; /* Light text color */
 }
 
 h3 {
-    color: #333; /* Dark text color */
+    color: #f4f4f9; /* Light text color */
 }
 
 ul {
