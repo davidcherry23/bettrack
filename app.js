@@ -60,26 +60,24 @@ function formatDateTime(dateTime) {
 
 // Modify the displayBets function to display amounts in pounds (£)
 async function displayBets() {
-    // Retrieve bets ordered by date
     const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(betsQuery);
     const betsTable = document.getElementById('betsTable').getElementsByTagName('tbody')[0];
     const totalStakedElement = document.getElementById('totalStaked');
     const totalReturnedElement = document.getElementById('totalReturned');
     const profitLossElement = document.getElementById('profitLoss');
-    const roiElement = document.getElementById('roi'); // Get the ROI element
+    const roiElement = document.getElementById('roi');
     const longestLosingStreakElement = document.getElementById('longestLosingStreak');
     const wonPlacedLostElement = document.getElementById('wonPlacedLost');
     const unsettledBetsElement = document.getElementById('unsettledBets');
     const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
 
-    // Check if any required elements are null
     if (!betsTable || !totalStakedElement || !totalReturnedElement || !profitLossElement || !roiElement || !longestLosingStreakElement || !wonPlacedLostElement || !unsettledBetsElement) {
         console.error("One or more elements not found.");
         return;
     }
 
-    betsTable.innerHTML = ''; // Clear current bets
+    betsTable.innerHTML = '';
     let totalStaked = 0;
     let totalReturned = 0;
     const bets = [];
@@ -88,20 +86,19 @@ async function displayBets() {
     let lostCount = 0;
     let unsettledCount = 0;
 
-    // Iterate over each bet document and apply search filter
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
-        if (searchInput.length === 0 || bet.name.toLowerCase().includes(searchInput)) {
-            bets.push(bet); // Store bet for later use
+        const formattedDate = formatDateTime(bet.date).toLowerCase();
+        
+        if (searchInput.length === 0 || bet.name.toLowerCase().includes(searchInput) || formattedDate.includes(searchInput)) {
+            bets.push(bet);
             const row = betsTable.insertRow();
 
-            // Fill table cells with bet information
             row.insertCell().textContent = bet.name;
-            row.insertCell().textContent = `£${parseFloat(bet.amount).toFixed(2)}`; // Display amount in pounds (£)
+            row.insertCell().textContent = `£${parseFloat(bet.amount).toFixed(2)}`;
             row.insertCell().textContent = bet.odds;
-            row.insertCell().textContent = formatDateTime(bet.date); // Use formatted date
+            row.insertCell().textContent = formatDateTime(bet.date);
 
-            // Fill outcome cell with bet outcome and set color based on outcome
             const outcomeCell = row.insertCell();
             outcomeCell.textContent = bet.outcome;
             switch (bet.outcome) {
@@ -115,10 +112,9 @@ async function displayBets() {
                     outcomeCell.style.color = 'orange';
                     break;
                 default:
-                    // For 'Pending', no specific color needed
             }
 
-            row.insertCell().textContent = `£${parseFloat(bet.returns).toFixed(2)}`; // Display returns in pounds (£)
+            row.insertCell().textContent = `£${parseFloat(bet.returns).toFixed(2)}`;
 
             const actionsCell = row.insertCell();
             if (bet.outcome === 'Pending') {
@@ -156,23 +152,21 @@ async function displayBets() {
 
     const longestLosingStreak = calculateLongestLosingStreakByDateTime(bets);
 
-    totalStakedElement.textContent = `Total Staked: £${totalStaked.toFixed(2)}`; // Display total staked in pounds (£)
-    totalReturnedElement.textContent = `Total Returned: £${totalReturned.toFixed(2)}`; // Display total returned in pounds (£)
+    totalStakedElement.textContent = `Total Staked: £${totalStaked.toFixed(2)}`;
+    totalReturnedElement.textContent = `Total Returned: £${totalReturned.toFixed(2)}`;
 
     const profitLoss = totalReturned - totalStaked;
-    profitLossElement.innerHTML = `Profit/Loss: <span style="color: ${profitLoss >= 0 ? 'green' : 'red'}">£${profitLoss.toFixed(2)}</span>`; // Display profit/loss in pounds (£)
+    profitLossElement.innerHTML = `Profit/Loss: <span style="color: ${profitLoss >= 0 ? 'green' : 'red'}">£${profitLoss.toFixed(2)}</span>`;
 
     const roi = totalStaked !== 0 ? ((totalReturned - totalStaked) / totalStaked) * 100 : 0;
     roiElement.innerHTML = `ROI: <span style="color: ${roi >= 0 ? 'green' : 'red'}">${roi.toFixed(2)}%</span>`;
 
     longestLosingStreakElement.textContent = `Longest Losing Streak: ${longestLosingStreak}`;
 
-    //
-
-    // Update Won-Placed-Lost with specific colors
     wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green">${wonCount}</span>-<span style="color: orange">${placedCount}</span>-<span style="color: red">${lostCount}</span>`;
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
+
 
 
 // Function to save changes to a bet
