@@ -173,8 +173,13 @@ async function displayBets() {
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
 }
 
-// Function to delete a bet
+// Function to delete a bet with confirmation
 async function deleteBet(betId) {
+    const confirmation = confirm("Are you sure you want to delete this bet?");
+    if (!confirmation) {
+        return;
+    }
+
     const betRef = doc(db, "bets", betId);
     try {
         await deleteDoc(betRef);
@@ -185,7 +190,6 @@ async function deleteBet(betId) {
         alert('Error deleting bet');
     }
 }
-
 
 
 // Function to save changes to a bet
