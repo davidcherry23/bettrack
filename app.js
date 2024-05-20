@@ -59,6 +59,7 @@ function formatDateTime(dateTime) {
 }
 
 // Modify the displayBets function to display amounts in pounds (£)
+// Function to display bets and include delete buttons for unsettled bets
 async function displayBets() {
     const betsQuery = query(collection(db, "bets"), orderBy("date", "desc"));
     const querySnapshot = await getDocs(betsQuery);
@@ -89,7 +90,7 @@ async function displayBets() {
     querySnapshot.forEach((doc) => {
         const bet = doc.data();
         const formattedDate = formatDateTime(bet.date).toLowerCase();
-        
+
         if (searchInput.length === 0 || bet.name.toLowerCase().includes(searchInput) || formattedDate.includes(searchInput)) {
             bets.push(bet);
             const row = betsTable.insertRow();
@@ -138,6 +139,11 @@ async function displayBets() {
                 saveButton.onclick = () => saveBetChanges(doc.id, outcomeSelect.value, returnInput.value, outcomeSelect, returnInput, saveButton);
                 actionsCell.appendChild(saveButton);
 
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deleteBet(doc.id);
+                actionsCell.appendChild(deleteButton);
+
                 unsettledCount++;
             }
 
@@ -165,6 +171,19 @@ async function displayBets() {
 
     wonPlacedLostElement.innerHTML = `Won-Placed-Lost: <span style="color: green">${wonCount}</span>-<span style="color: orange">${placedCount}</span>-<span style="color: red">${lostCount}</span>`;
     unsettledBetsElement.textContent = `Unsettled bets: ${unsettledCount}`;
+}
+
+// Function to delete a bet
+async function deleteBet(betId) {
+    const betRef = doc(db, "bets", betId);
+    try {
+        await deleteDoc(betRef);
+        alert('Bet deleted successfully!');
+        displayBets(); // Refresh the list to reflect changes
+    } catch (error) {
+        console.error('Error deleting bet: ', error);
+        alert('Error deleting bet');
+    }
 }
 
 
