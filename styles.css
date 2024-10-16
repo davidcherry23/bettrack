@@ -1,9 +1,9 @@
-/* General styles */
+/* General styles for Dark Mode */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text color */
 }
 
 input[type="text"],
@@ -12,16 +12,16 @@ input[type="datetime-local"],
 button {
     padding: 10px;
     margin: 5px;
-    border: 2px solid #ccc;
+    border: 2px solid #555; /* Darker border */
     border-radius: 5px;
     width: 200px;
-    background-color: #fff; /* White background */
-    color: #333;
+    background-color: #333; /* Darker input background */
+    color: #e0e0e0; /* Light text color */
 }
 
 button {
     cursor: pointer;
-    background-color: #4CAF50;
+    background-color: #1E88E5; /* Blue for button */
     color: white;
     border: none;
     border-radius: 5px;
@@ -30,10 +30,10 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #1565C0; /* Darker blue on hover */
 }
 
-/* Table styles */
+/* Table styles for Dark Mode */
 table {
     width: 100%;
     margin-top: 20px;
@@ -43,37 +43,48 @@ table {
 th, td {
     text-align: left;
     padding: 8px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #555; /* Darker border */
 }
 
 th {
-    background-color: #4CAF50;
+    background-color: #1E88E5; /* Blue for header */
     color: white;
 }
 
 /* Add alternating background colors to table rows */
 tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: #333; /* Darker background for even rows */
+}
+
+tr:nth-child(odd) {
+    background-color: #212121; /* Even darker background for odd rows */
 }
 
 /* Export button */
 #exportButton {
     font-size: 12px;
     padding: 5px 10px;
+    background-color: #424242; /* Darker button background */
+    color: #e0e0e0;
+    border: none;
+}
+
+#exportButton:hover {
+    background-color: #616161; /* Lighter on hover */
 }
 
 /* Summary chart */
 #summaryChart {
-    background-color: white;
+    background-color: #1c1c1c; /* Dark background for chart */
     padding: 15px;
     margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.6); /* Darker shadow */
     border-radius: 5px;
 }
 
 /* Headings */
 h3 {
-    color: #333;
+    color: #e0e0e0; /* Light heading color */
 }
 
 ul {
