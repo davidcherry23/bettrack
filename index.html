@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
-    
     <div id="summaryChart" style="position: fixed; top: 20px; right: 20px;">
         <h3>Summary</h3>
         <p id="totalStaked">Total Staked: $0</p>
@@ -16,13 +15,16 @@
         <p id="roi">ROI: 0.00%</p>
         <p id="wonPlacedLost">Won-Placed-Lost: <span style="color: green;">0</span>-<span>0</span>-<span style="color: red;">0</span></p>
         <p id="longestLosingStreak">Longest Losing Streak: 0</p>
-        <p id="unsettledBets">Unsettled bets: 0</p>
+        <p id="unsettledBets">Unsettled bets: 0</p> <!-- Add the element for unsettled bets -->
     </div>
 
     <div>
         <input type="text" id="betName" placeholder="Bet Name">
         <input type="number" id="betAmount" placeholder="Bet Amount">
         <input type="text" id="betOdds" placeholder="Odds (e.g., 5/1)">
+        <input type="datetime-local" id="betDate" placeholder="Date/Time">
+        
+        <!-- Dropdown for Course Selection -->
         <select id="betCourse">
             <option value="">Select Course</option>
             <option value="Aintree">Aintree</option>
@@ -112,23 +114,25 @@
             <option value="Yarmouth">Yarmouth</option>
             <option value="York">York</option>
         </select>
-        <input type="datetime-local" id="betDate" placeholder="Date/Time">
+        
         <button id="addBetButton">Add Bet</button>
     </div>
 
     <div>
-        <input type="text" id="searchInput" placeholder="Search bets">
+        <input type="text" id="searchInput" placeholder="Search bets (by name, date, or course)">
     </div>
 
+    <!-- Section to display bets in a table -->
     <table id="betsTable">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Amount</th>
                 <th>Odds</th>
-                <th>Course</th> <!-- Added Course header -->
                 <th>Date/Time</th>
+                <th>Course</th> <!-- Added Course column -->
                 <th>Outcome</th>
+                <th></th> <!-- Actions header -->
             </tr>
         </thead>
         <tbody>
@@ -137,6 +141,7 @@
 
     <button id="exportButton" class="smallButton">Export Table Data</button>
 
+    <!-- Charts Section -->
     <div id="chartsContainer" style="display: flex;">
         <div id="outcomeChartContainer" style="flex: 1;"></div>
         <div id="profitLossChartContainer" style="flex: 1;"></div>
