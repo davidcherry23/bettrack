@@ -8,8 +8,6 @@
 </head>
 <body>
     
-
-    
     <div id="summaryChart" style="position: fixed; top: 20px; right: 20px;">
         <h3>Summary</h3>
         <p id="totalStaked">Total Staked: $0</p>
@@ -18,44 +16,127 @@
         <p id="roi">ROI: 0.00%</p>
         <p id="wonPlacedLost">Won-Placed-Lost: <span style="color: green;">0</span>-<span>0</span>-<span style="color: red;">0</span></p>
         <p id="longestLosingStreak">Longest Losing Streak: 0</p>
-        <p id="unsettledBets">Unsettled bets: 0</p> <!-- Add the element for unsettled bets -->
+        <p id="unsettledBets">Unsettled bets: 0</p>
     </div>
 
     <div>
         <input type="text" id="betName" placeholder="Bet Name">
         <input type="number" id="betAmount" placeholder="Bet Amount">
         <input type="text" id="betOdds" placeholder="Odds (e.g., 5/1)">
+        <select id="betCourse">
+            <option value="">Select Course</option>
+            <option value="Aintree">Aintree</option>
+            <option value="Ascot">Ascot</option>
+            <option value="Ayr">Ayr</option>
+            <option value="Bangor">Bangor</option>
+            <option value="Bath">Bath</option>
+            <option value="Ballinrobe">Ballinrobe</option>
+            <option value="Bellewstown">Bellewstown</option>
+            <option value="Beverley">Beverley</option>
+            <option value="Brighton">Brighton</option>
+            <option value="Carlisle">Carlisle</option>
+            <option value="Cartmel">Cartmel</option>
+            <option value="Catterick">Catterick</option>
+            <option value="Chelmsford City">Chelmsford City</option>
+            <option value="Cheltenham">Cheltenham</option>
+            <option value="Chepstow">Chepstow</option>
+            <option value="Chester">Chester</option>
+            <option value="Clonmel">Clonmel</option>
+            <option value="Cork">Cork</option>
+            <option value="Curragh">Curragh</option>
+            <option value="Doncaster">Doncaster</option>
+            <option value="Down Royal">Down Royal</option>
+            <option value="Downpatrick">Downpatrick</option>
+            <option value="Dundalk">Dundalk</option>
+            <option value="Epsom">Epsom</option>
+            <option value="Exeter">Exeter</option>
+            <option value="Fairyhouse">Fairyhouse</option>
+            <option value="Fakenham">Fakenham</option>
+            <option value="Ffos Las">Ffos Las</option>
+            <option value="Fontwell">Fontwell</option>
+            <option value="Galway">Galway</option>
+            <option value="Goodwood">Goodwood</option>
+            <option value="Gowran Park">Gowran Park</option>
+            <option value="Hamilton">Hamilton</option>
+            <option value="Haydock">Haydock</option>
+            <option value="Hereford">Hereford</option>
+            <option value="Hexham">Hexham</option>
+            <option value="Huntingdon">Huntingdon</option>
+            <option value="Kelso">Kelso</option>
+            <option value="Kempton">Kempton</option>
+            <option value="Killarney">Killarney</option>
+            <option value="Kilbeggan">Kilbeggan</option>
+            <option value="Laytown">Laytown</option>
+            <option value="Leicester">Leicester</option>
+            <option value="Leopardstown">Leopardstown</option>
+            <option value="Lingfield">Lingfield</option>
+            <option value="Limerick">Limerick</option>
+            <option value="Listowel">Listowel</option>
+            <option value="Ludlow">Ludlow</option>
+            <option value="Market Rasen">Market Rasen</option>
+            <option value="Musselburgh">Musselburgh</option>
+            <option value="Naas">Naas</option>
+            <option value="Navan">Navan</option>
+            <option value="Newbury">Newbury</option>
+            <option value="Newcastle">Newcastle</option>
+            <option value="Newmarket">Newmarket</option>
+            <option value="Newton Abbot">Newton Abbot</option>
+            <option value="Nottingham">Nottingham</option>
+            <option value="Perth">Perth</option>
+            <option value="Plumpton">Plumpton</option>
+            <option value="Pontefract">Pontefract</option>
+            <option value="Punchestown">Punchestown</option>
+            <option value="Redcar">Redcar</option>
+            <option value="Ripon">Ripon</option>
+            <option value="Roscommon">Roscommon</option>
+            <option value="Salisbury">Salisbury</option>
+            <option value="Sandown">Sandown</option>
+            <option value="Sedgefield">Sedgefield</option>
+            <option value="Sligo">Sligo</option>
+            <option value="Southwell">Southwell</option>
+            <option value="Stratford">Stratford</option>
+            <option value="Taunton">Taunton</option>
+            <option value="Thirsk">Thirsk</option>
+            <option value="Thurles">Thurles</option>
+            <option value="Tipperary">Tipperary</option>
+            <option value="Towcester">Towcester</option>
+            <option value="Tramore">Tramore</option>
+            <option value="Uttoxeter">Uttoxeter</option>
+            <option value="Warwick">Warwick</option>
+            <option value="Wetherby">Wetherby</option>
+            <option value="Wexford">Wexford</option>
+            <option value="Wincanton">Wincanton</option>
+            <option value="Windsor">Windsor</option>
+            <option value="Wolverhampton">Wolverhampton</option>
+            <option value="Worcester">Worcester</option>
+            <option value="Yarmouth">Yarmouth</option>
+            <option value="York">York</option>
+        </select>
         <input type="datetime-local" id="betDate" placeholder="Date/Time">
         <button id="addBetButton">Add Bet</button>
     </div>
 
-        <div>
-    <input type="text" id="searchInput" placeholder="Search bets">
+    <div>
+        <input type="text" id="searchInput" placeholder="Search bets">
     </div>
 
-
-    
-    <!-- Section to display bets in a table -->
     <table id="betsTable">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Amount</th>
                 <th>Odds</th>
+                <th>Course</th> <!-- Added Course header -->
                 <th>Date/Time</th>
                 <th>Outcome</th>
-                <th></th> <!-- Actions header removed -->
             </tr>
         </thead>
         <tbody>
         </tbody>
     </table>
 
-<button id="exportButton" class="smallButton">Export Table Data</button>
+    <button id="exportButton" class="smallButton">Export Table Data</button>
 
-
-    
-    <!-- Charts Section -->
     <div id="chartsContainer" style="display: flex;">
         <div id="outcomeChartContainer" style="flex: 1;"></div>
         <div id="profitLossChartContainer" style="flex: 1;"></div>
